@@ -11,16 +11,22 @@
     </parent>
 
     <groupId>com.zenlong.study</groupId>
-    <artifactId>spring-boot-domain</artifactId>
+    <artifactId>spring-boot-elasticsearch</artifactId>
     <packaging>jar</packaging>
     <version>1.0</version>
-    <name>spring-boot-domain</name>
+    <name>spring-boot-elasticsearch</name>
+    <description>Elasticsearch工具类</description>
 
     <properties>
+        <elasticsearch.version>6.4.0</elasticsearch.version>
     </properties>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

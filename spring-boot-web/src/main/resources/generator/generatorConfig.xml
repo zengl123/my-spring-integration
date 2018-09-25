@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <properties resource="application.properties"/>
+    <classPathEntry
+            location="${maven.home}/Repository/mysql/mysql-connector-java/${mysql.version}/mysql-connector-java-${mysql.version}.jar"/>
+    <context id="mysqlTables" targetRuntime="MyBatis3" defaultModelType="flat">
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+        <!-- 自定义参数 -->
+        <property name="baseFields" value="id,creator,modifier,createTime,modifiedTime"/>
+        <property name="createTimeColumn" value="create_time"/>
+        <property name="modifiedTimeColumn" value="modified_time"/>
+        <property name="updateIgnoreColumn" value="creator"/>
+        <!--<property name="insertIgnoreColumn" value="modifier"/>-->
+        <property name="lombok" value="true"/>
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <!-- comment -->
+        <commentGenerator>
+            <property name="author" value="zengling"/><!-- 自定义参数 -->
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="false"/>
+            <property name="addRemarkComments" value="true"/>
+        </commentGenerator>
+        <!-- jdbc -->
+        <jdbcConnection driverClass="${spring.datasource.druid.driver-class-name}"
+                        connectionURL="${spring.datasource.druid.url}"
+                        userId="${spring.datasource.druid.username}"
+                        password="${spring.datasource.druid.password}">
+        </jdbcConnection>
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+        <!-- model -->
+        <javaModelGenerator targetPackage="com.zenlong.study.domain.pojo" targetProject="src/main/java">
+            <property name="trimStrings" value="true"/>
+            <property name="enableSubPackages" value="true"/>
+            <property name="rootClass" value="com.zenlong.study.domain.pojo.BaseModel"/>
+        </javaModelGenerator>
+        <!-- mapper.xml -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!-- mapper.java -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.zenlong.study.dao"
+                             targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="rootGenerics" value="true"/>
+            <property name="rootInterface" value="com.zenlong.study.dao.BaseMapper"/>
+        </javaClientGenerator>
+        <!-- table -->
+        <table tableName="ec_user">
+            <generatedKey column="id" sqlStatement="select replace(UUID(), '-', '')" identity="false"/>
+        </table>
+    </context>
+</generatorConfiguration>
