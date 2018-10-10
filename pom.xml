@@ -12,6 +12,7 @@
         <module>spring-boot-web</module>
         <module>spring-boot-redis</module>
         <module>spring-boot-elasticsearch</module>
+        <module>spring-boot-data-jt808</module>
     </modules>
 
     <parent>
@@ -28,8 +29,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <lombok.version>1.18.0</lombok.version>
         <swagger2.version>2.4.0</swagger2.version>
         <swagger2.version>2.4.0</swagger2.version>
@@ -99,8 +100,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <skip>true</skip>
                 </configuration>
