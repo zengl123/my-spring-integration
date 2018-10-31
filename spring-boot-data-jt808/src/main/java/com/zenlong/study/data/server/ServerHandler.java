@@ -48,9 +48,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws InterruptedException {
+        logger.info("message:{}", msg);
         try {
             ByteBuf buf = (ByteBuf) msg;
             if (buf.readableBytes() <= 0) {
+                logger.info("msg is null");
                 return;
             }
             byte[] bs = new byte[buf.readableBytes()];
@@ -61,7 +63,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             pkg.setChannel(ctx.channel());
             this.processPackageData(pkg);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("channelRead()异常:{}", e.getMessage());
         } finally {
             ReferenceCountUtil.release(msg);
         }
@@ -87,6 +89,14 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             //5.位置信息汇报 ==> 平台通用应答
             LocationInfoUploadMsg locationInfoUploadMsg = this.msgDecoder.toLocationInfoUploadMsg(packageData);
             this.msgProcessService.processLocationInfoUploadMsg(locationInfoUploadMsg);
+            //拿到位置信息进行存储
+            String terminalPhone = locationInfoUploadMsg.getMsgHeader().getTerminalPhone();
+            float latitude = locationInfoUploadMsg.getLatitude();
+            float longitude = locationInfoUploadMsg.getLongitude();
+            float speed = locationInfoUploadMsg.getSpeed();
+            int direction = locationInfoUploadMsg.getDirection();
+            int elevation = locationInfoUploadMsg.getElevation();
+            String time = locationInfoUploadMsg.getTime();
 
         } else {
             //6.其他

@@ -63,7 +63,7 @@ public class TerminalMsgProcessService extends BaseMsgProcessService {
      * @throws Exception
      */
     public void processAuthMsg(TerminalAuthenticationMsg msg) throws Exception {
-        logger.debug("终端鉴权:{}", JSON.toJSONString(msg, true));
+        logger.info("终端鉴权:{}", JSON.toJSONString(msg, true));
         final String sessionId = Session.buildId(msg.getChannel());
         Session session = sessionManager.findBySessionId(sessionId);
         if (session == null) {
@@ -88,7 +88,7 @@ public class TerminalMsgProcessService extends BaseMsgProcessService {
      * @throws Exception
      */
     public void processTerminalHeartBeatMsg(PackageData req) throws Exception {
-        logger.debug("心跳信息:{}", JSON.toJSONString(req, true));
+        logger.info("心跳信息:{}", JSON.toJSONString(req, true));
         final MsgHeader reqHeader = req.getMsgHeader();
         ServerCommonRespMsgBody respMsgBody = new ServerCommonRespMsgBody(reqHeader.getFlowId(), reqHeader.getMsgId(),
                 ServerCommonRespMsgBody.SUCCESS);
@@ -120,7 +120,7 @@ public class TerminalMsgProcessService extends BaseMsgProcessService {
      * @throws Exception
      */
     public void processLocationInfoUploadMsg(LocationInfoUploadMsg req) throws Exception {
-        logger.debug("位置信息:{}", JSON.toJSONString(req, true));
+        logger.info("位置信息:{}", JSON.toJSONString(req, true));
         final MsgHeader reqHeader = req.getMsgHeader();
         ServerCommonRespMsgBody respMsgBody = new ServerCommonRespMsgBody(reqHeader.getFlowId(), reqHeader.getMsgId(),
                 ServerCommonRespMsgBody.SUCCESS);

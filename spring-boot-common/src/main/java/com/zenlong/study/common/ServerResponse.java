@@ -1,6 +1,7 @@
 package com.zenlong.study.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
@@ -17,8 +18,8 @@ import java.io.Serializable;
  * @Version
  * @Modified By
  */
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ServerResponse<T> implements Serializable {
     private String message;
     private Integer status;

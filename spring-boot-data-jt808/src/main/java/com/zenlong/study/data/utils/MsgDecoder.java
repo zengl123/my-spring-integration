@@ -55,16 +55,16 @@ public class MsgDecoder {
 */
 
     /**
-     * @Description: 将byte[]解码成业务对象
      * @param data
      * @return PackageData
+     * @Description: 将byte[]解码成业务对象
      */
     public PackageData bytes2PackageData(byte[] data) {
         //先把数据包反转义一下
         List<Byte> listbs = new ArrayList<Byte>();
         for (int i = 1; i < data.length - 1; i++) {
             //如果当前位是0x7d，判断后一位是否是0x02或0x01，如果是，则反转义
-            if ((data[i] == (byte)0x7d) && (data[i + 1] == (byte) 0x02)) {
+            if ((data[i] == (byte) 0x7d) && (data[i + 1] == (byte) 0x02)) {
                 listbs.add((byte) JT808Const.PKG_DELIMITER);
                 i++;
             } else if ((data[i] == (byte) 0x7d) && (data[i + 1] == (byte) 0x01)) {
@@ -187,26 +187,37 @@ public class MsgDecoder {
     public LocationInfoUploadMsg toLocationInfoUploadMsg(PackageData packageData) {
         LocationInfoUploadMsg ret = new LocationInfoUploadMsg(packageData);
         final byte[] data = ret.getMsgBodyBytes();
+        logger.info("data:{}", data);
+        String body = DigitUtil.bytesToHexString(data);
+        logger.info(body);
         // 1. byte[0-3] 报警标志(DWORD(32))
         ret.setWarningFlagField(this.parseIntFromBytes(data, 0, 3));
         // 2. byte[4-7] 状态(DWORD(32))
         ret.setStatusField(this.parseIntFromBytes(data, 4, 4));
         // 3. byte[8-11] 纬度(DWORD(32)) 以度为单位的纬度值乘以10^6，精确到百万分之一度
-        ret.setLatitude(this.parseFloatFromBytes(data, 8, 4));
+        ret.setLatitude((float) Integer.parseUnsignedInt(body.substring(16, 24), 16) / 1000000);
         // 4. byte[12-15] 经度(DWORD(32)) 以度为单位的经度值乘以10^6，精确到百万分之一度
-        ret.setLongitude(this.parseFloatFromBytes(data, 12, 4));
+        ret.setLongitude((float) Integer.parseUnsignedInt(body.substring(24, 32), 16) / 1000000);
         // 5. byte[16-17] 高程(WORD(16)) 海拔高度，单位为米（ m）
+        double v = Integer.parseUnsignedInt(body.substring(32, 36), 16);
+        logger.info("Elevation1:{}",v);
         ret.setElevation(this.parseIntFromBytes(data, 16, 2));
+        logger.info("Elevation2:{}",this.parseIntFromBytes(data, 16, 2));
         // byte[18-19] 速度(WORD) 1/10km/h
-        ret.setSpeed(this.parseFloatFromBytes(data, 18, 2));
+        ret.setSpeed((float) Integer.parseUnsignedInt(body.substring(36, 40), 16));
         // byte[20-21] 方向(WORD) 0-359，正北为 0，顺时针
+        int q = Integer.parseUnsignedInt(body.substring(40, 44), 16);
+        logger.info("Direction1:{}",q);
         ret.setDirection(this.parseIntFromBytes(data, 20, 2));
+        logger.info("Direction2:{}",this.parseIntFromBytes(data, 20, 2));
         // byte[22-x] 时间(BCD[6]) YY-MM-DD-hh-mm-ss
         // GMT+8 时间，本标准中之后涉及的时间均采用此时区
         byte[] tmp = new byte[6];
         System.arraycopy(data, 22, tmp, 0, 6);
         String time = this.parseBcdStringFromBytes(data, 22, 6);
+        logger.info("time:{}",time);
         ret.setTime(time);
+        logger.info("ret:{}", ret);
         return ret;
     }
 

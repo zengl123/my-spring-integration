@@ -70,4 +70,5 @@ public class JT808Const {
      * 查询终端参数
      */
     public static final int CMD_TERMINAL_PARAM_QUERY = 0x8104;
+
 }

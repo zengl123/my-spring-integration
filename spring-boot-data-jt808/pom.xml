@@ -13,7 +13,7 @@
     <groupId>com.zenlong.study.data</groupId>
     <artifactId>spring-boot-data-jt808</artifactId>
     <version>1.0</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <dependencies>
         <dependency>
@@ -31,4 +31,7 @@
             <version>1.0</version>
         </dependency>
     </dependencies>
+    <build>
+        <finalName>ROOT</finalName>
+    </build>
 </project>

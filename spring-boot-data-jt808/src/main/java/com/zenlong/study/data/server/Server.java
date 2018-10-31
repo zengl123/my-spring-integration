@@ -1,5 +1,6 @@
 package com.zenlong.study.data.server;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.zenlong.study.data.constant.JT808Const;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
@@ -16,8 +17,7 @@ import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 描述:
@@ -49,8 +49,8 @@ public class Server {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(JT808Const.TCP_CLIENT_IDLE_MINUTES, 0, 0, TimeUnit.MINUTES));
                             //1024表示单条消息的最大长度，解码器在查找分隔符的时候，达到该长度还没找到的话会抛异常
-                            ch.pipeline().addLast(new DelimiterBasedFrameDecoder(2048, true, Unpooled.copiedBuffer(new byte[] { 0x7e }),
-                                    Unpooled.copiedBuffer(new byte[] { 0x7e, 0x7e })));
+                            ch.pipeline().addLast(new DelimiterBasedFrameDecoder(1024, true, Unpooled.copiedBuffer(new byte[]{0x7e}),
+                                    Unpooled.copiedBuffer(new byte[]{0x7e, 0x7e})));
                             //添加业务处理handler
                             ch.pipeline().addLast(new ServerHandler());
                         }
@@ -72,31 +72,21 @@ public class Server {
             throw new IllegalStateException(this.getName() + "已启动，不能重复启动");
         }
         this.isRunning = true;
-
-        new Thread(() -> {
-            try {
-                this.bind();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, this.getName()).start();
-    }
-
-    public synchronized void stopServer() {
-        if (!this.isRunning) {
-            throw new IllegalStateException(this.getName() + "未启动");
-        }
-        this.isRunning = false;
-        try {
-            Future<?> future = this.workerGroup.shutdownGracefully().await();
-            if (!future.isSuccess()) {
-            }
-            future = this.bossGroup.shutdownGracefully().await();
-            if (!future.isSuccess()) {
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("gps-thread-%d").build();
+        ExecutorService pool = new ThreadPoolExecutor(10, 1000, 0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingDeque<>(256),
+                namedThreadFactory,
+                new ThreadPoolExecutor.AbortPolicy());
+        pool.execute(() -> {
+                    try {
+                        bind();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
+        pool.shutdown();
     }
 
     private String getName() {

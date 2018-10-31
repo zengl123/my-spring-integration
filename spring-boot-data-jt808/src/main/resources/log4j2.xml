@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off" monitorInterval="600">
+    <Properties>
+        <Property name="LOG_HOME">logs</Property>
+    </Properties>
+    <Appenders>
+        <!--输出控制台的配置-->
+        <Console name="console" target="SYSTEM_OUT">
+            <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%p][%c{40}][%t] %m%n</pattern>
+            </PatternLayout>
+        </Console>
+        <!-- debug.log-->
+        <!--<RollingRandomAccessFile name="debug_appender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/debug.log"
+                                 filePattern="${LOG_HOME}/debug.%d{yyyy-MM-dd}.log.gz">
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%p][%c{40}][%t] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>-->
+        <!-- info.log-->
+        <RollingRandomAccessFile name="info_appender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/info.log"
+                                 filePattern="${LOG_HOME}/info.%d{yyyy-MM-dd}.log.gz">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %L %-5p %class{36} %M -->%message%xEx%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <!-- 自动追加日志信息到文件中，直至文件达到预定的大小，然后自动重新生成另外一个文件来记录之后的日志-->
+        <!-- 设置日志格式并配置回滚日志压缩格式(error.log.年份.gz) -->
+        <RollingRandomAccessFile name="error_appender"
+                                 immediateFlush="true" fileName="${LOG_HOME}/error.log"
+                                 filePattern="${LOG_HOME}/error.%d{yyyy-MM-dd}.log.gz">
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%p][%c{40}][%t] %m%n</pattern>
+            </PatternLayout>
+            <!-- 指定滚动日志的策略，就是什么时候进行新建日志文件输出日志.-->
+            <Policies>
+                <!-- interval属性用来指定多久滚动一次,单位对应filePattern里的日期格式 此处单位为天-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <Loggers>
+        <root level="info">
+            <appender-ref ref="console"/>
+            <appender-ref ref="info_appender"/>
+            <appender-ref ref="error_appender"/>
+        </root>
+    </Loggers>
+</Configuration>
