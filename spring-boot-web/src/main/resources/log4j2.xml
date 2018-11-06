@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="off" monitorInterval="600">
     <Properties>
-        <Property name="LOG_HOME">F:\\JAVA_DEV\\my-spring-integration\\spring-boot-web\\target/logs</Property>
+        <Property name="LOG_HOME">logs</Property>
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
