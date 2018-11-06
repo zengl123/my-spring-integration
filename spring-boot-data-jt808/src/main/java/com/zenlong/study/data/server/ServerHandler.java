@@ -96,7 +96,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             float speed = locationInfoUploadMsg.getSpeed();
             int direction = locationInfoUploadMsg.getDirection();
             int elevation = locationInfoUploadMsg.getElevation();
-            String time = locationInfoUploadMsg.getTime();
+            locationInfoUploadMsg.getTime();
 
         } else {
             //6.其他

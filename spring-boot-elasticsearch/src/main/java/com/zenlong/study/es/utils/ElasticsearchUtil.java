@@ -9,9 +9,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 描述:
@@ -20,30 +22,21 @@ import java.io.IOException;
  * @Author:ZENLIN
  * @Created 2018/10/23  11:59.
  */
-@SpringBootTest
-@RunWith(SpringRunner.class)
 @Slf4j
+@Component
 public class ElasticsearchUtil {
     @Autowired
     private RestHighLevelClient highLevelClient;
 
-
-    public ServerResponse get(String index, String type, String id) {
+    public ServerResponse getById(String index, String type, String id) {
         GetRequest getRequest = new GetRequest(index, type, id);
         try {
             GetResponse documentFields = highLevelClient.get(getRequest);
-            return ServerResponse.createBySuccess();
+            Map<String, Object> source = documentFields.getSource();
+            return ServerResponse.createBySuccess(source);
         } catch (IOException e) {
             log.error(e.getMessage());
-            ServerResponse<Object> byErrorMessage = ServerResponse.createByErrorMessage(e.getMessage());
-            boolean success = byErrorMessage.isSuccess();
-            return null;
+            return ServerResponse.createByErrorMessage(e.getMessage());
         }
-    }
-
-    @Test
-    public void testGet() {
-        ServerResponse serverResponse = get("indexvehiclegpsrecord", "vehicle_gps_record", "ab94a00d4e1344278f4350f7f8aed0ce");
-        System.out.println("serverResponse = " + serverResponse);
     }
 }
