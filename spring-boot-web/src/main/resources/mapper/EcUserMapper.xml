@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zenlong.study.dao.EcUserMapper">
+    <resultMap id="BaseResultMap" type="com.zenlong.study.domain.pojo.EcUser">
+        <id column="id" property="id"/>
+        <result column="user_name" property="userName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modified_time" property="modifiedTime"/>
+    </resultMap>
+
+    <sql id="Table">
+        ec_user
+    </sql>
+
+    <sql id="Base_Column_List">
+        id, user_name, `password`, email, phone, question, answer, `role`, create_time, modified_time, 
+        creator, modifier
+    </sql>
+
+    <sql id="Condition">
+        <where>
+        </where>
+    </sql>
+
+    <insert id="insert">
+        insert into 
+        <include refid="Table"/>(
+        id, 
+        user_name, 
+        `password`, 
+        email, 
+        phone, 
+        question, 
+        answer, 
+        `role`, 
+        create_time, 
+        modified_time, 
+        creator, 
+        modifier
+        )
+        values (
+        #{id}, 
+        #{userName}, 
+        #{password}, 
+        #{email}, 
+        #{phone}, 
+        #{question}, 
+        #{answer}, 
+        #{role}, 
+        now(), 
+        now(), 
+        #{creator}, 
+        #{modifier}
+        )
+    </insert>
+
+    <insert id="insertBatch">
+        insert into 
+        <include refid="Table"/>(
+        id, 
+        user_name, 
+        `password`, 
+        email, 
+        phone, 
+        question, 
+        answer, 
+        `role`, 
+        create_time, 
+        modified_time, 
+        creator, 
+        modifier
+        )
+        values
+        <foreach collection="list" item="obj" separator=",">(
+            (select replace(UUID(), '-', '') as id), 
+            #{obj.userName}, 
+            #{obj.password}, 
+            #{obj.email}, 
+            #{obj.phone}, 
+            #{obj.question}, 
+            #{obj.answer}, 
+            #{obj.role}, 
+            now(), 
+            now(), 
+            #{obj.creator}, 
+            #{obj.modifier}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteById">
+        delete from 
+        <include refid="Table"/>
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteByIds">
+        delete from 
+        <include refid="Table"/>
+        where id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="update">
+        update 
+        <include refid="Table"/>
+        <set>
+            <if test="userName!=null">user_name=#{userName},</if>
+            <if test="password!=null">`password`=#{password},</if>
+            <if test="email!=null">email=#{email},</if>
+            <if test="phone!=null">phone=#{phone},</if>
+            <if test="question!=null">question=#{question},</if>
+            <if test="answer!=null">answer=#{answer},</if>
+            <if test="role!=null">`role`=#{role},</if>
+            modified_time=now(),
+            <if test="modifier!=null">modifier=#{modifier},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateBatch">
+        update 
+        <include refid="Table"/>
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="user_name=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.userName!=null">
+                        when id=#{obj.id} then #{obj.userName}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="`password`=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.password!=null">
+                        when id=#{obj.id} then #{obj.password}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="email=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.email!=null">
+                        when id=#{obj.id} then #{obj.email}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="phone=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.phone!=null">
+                        when id=#{obj.id} then #{obj.phone}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="question=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.question!=null">
+                        when id=#{obj.id} then #{obj.question}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="answer=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.answer!=null">
+                        when id=#{obj.id} then #{obj.answer}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="`role`=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.role!=null">
+                        when id=#{obj.id} then #{obj.role}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="modified_time=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    when id=#{obj.id} then now()
+                </foreach>
+            </trim>
+            <trim prefix="modifier=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.modifier!=null">
+                        when id=#{obj.id} then #{obj.modifier}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" item="obj" separator="," open="(" close=")">
+            #{obj.id}
+        </foreach>
+    </update>
+
+    <select id="findById" resultMap="BaseResultMap">
+        select 
+        <include refid="Base_Column_List"/>
+        from 
+        <include refid="Table"/>
+        where id = #{id}
+    </select>
+
+    <select id="findByIds" resultMap="BaseResultMap">
+        select 
+        <include refid="Base_Column_List"/>
+        from 
+        <include refid="Table"/>
+        where id in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select 
+        <include refid="Base_Column_List"/>
+        from 
+        <include refid="Table"/>
+    </select>
+
+    <select id="checkUserName" resultType="java.lang.Integer" parameterType="string">
+        select count(1)
+        from
+        <include refid="Table"/>
+        where
+        user_name=#{userName}
+    </select>
+
+    <select id="checkEmail" resultType="java.lang.Integer" parameterType="string">
+        select count(1)
+        from
+        <include refid="Table"/>
+        where
+        email=#{email}
+    </select>
+
+    <select id="checkPhone" resultType="java.lang.Integer" parameterType="string">
+        select count(1)
+        from
+        <include refid="Table"/>
+        where
+        phone=#{phone}
+    </select>
+
+    <select id="checkAnswer" resultType="java.lang.Integer" parameterType="map">
+        select count(1)
+        from
+        <include refid="Table"/>
+        where
+        user_name=#{userName}
+        and
+        question=#{question}
+        and
+        answer=#{answer}
+    </select>
+
+</mapper>
