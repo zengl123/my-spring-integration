@@ -8,7 +8,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -23,6 +26,7 @@ import javax.validation.Valid;
  * @Version 1.0
  * @Modified By
  */
+
 @Api(tags = "USER", description = "用户模块")
 @RestController
 @RequestMapping("/user/")
@@ -30,9 +34,9 @@ public class UserApplication {
     @Autowired
     private IEcUserService service;
 
-    @ApiOperation(value = "register",notes = "用户注册")
+    @ApiOperation(value = "register", notes = "用户注册")
     @RequestMapping(value = "register", method = RequestMethod.POST)
-    public ServerResponse register(@RequestBody @Valid EcUser ecUser,BindingResult bindingResult) {
+    public ServerResponse register(@RequestBody @Valid EcUser ecUser, BindingResult bindingResult) {
         ServerResponse serverResponse = ValidUtil.requestBodyValid(bindingResult);
         if (serverResponse.isSuccess()) {
             return service.register(ecUser);
