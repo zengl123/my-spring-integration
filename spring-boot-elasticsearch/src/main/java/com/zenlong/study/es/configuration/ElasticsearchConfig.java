@@ -26,17 +26,12 @@ import java.util.Objects;
  * @Modified By
  */
 
-@Data
+
 @Slf4j
 @Configuration
 public class ElasticsearchConfig {
     @Value("${elasticsearch.ip}")
     private String[] ipAddress;
-    private int connectTimeOut;
-    private int socketTimeOut;
-    private int connectionRequestTimeOut;
-    private int maxConnectNum;
-    private int maxConnectPerRoute;
 
     private static final int ADDRESS_LENGTH = 2;
     private static final String HTTP_SCHEME = "http";
