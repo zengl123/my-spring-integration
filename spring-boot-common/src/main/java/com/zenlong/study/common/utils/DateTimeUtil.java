@@ -272,7 +272,7 @@ public class DateTimeUtil {
     /**
      * 判断一个日期时间是否为下午
      *
-     * @param date 日期
+     * @param date 日期∂∂
      * @return true: 是 false: 否
      */
     public static boolean isPM(Date date) {

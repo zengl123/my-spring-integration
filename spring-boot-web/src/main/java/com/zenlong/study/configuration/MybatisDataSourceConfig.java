@@ -36,7 +36,7 @@ public class MybatisDataSourceConfig {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource());
-        sqlSessionFactoryBean.setTypeAliasesPackage("com.zenlong.study.domain.pojo");
+        sqlSessionFactoryBean.setTypeAliasesPackage("com.zenlong.study.domain");
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactoryBean.setMapperLocations(resolver.getResources("classpath:mapper/**/*.xml"));
         return sqlSessionFactoryBean.getObject();

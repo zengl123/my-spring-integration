@@ -1,8 +1,6 @@
 package com.zenlong.study.redis.configuartion;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -16,16 +14,14 @@ import org.springframework.context.annotation.Configuration;
  * @Version 1.0
  * @Modified By
  */
-@Data
-@Configuration(value = "classpath:redis.properties")
-@ConfigurationProperties(prefix = "spring.redis")
+@Configuration
 public class RedisConfig {
     @Value("${spring.redis.host}")
     private String host;
     @Value("${spring.redis.port}")
-    private int port;
+    private String port;
     @Value("${spring.redis.database}")
-    private int database;
+    private String database;
     private int timeout = 3000;
     private String password;
     private int poolMaxTotal = 1000;
