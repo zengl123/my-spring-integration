@@ -36,10 +36,10 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
         <!-- model -->
-        <javaModelGenerator targetPackage="com.zenlong.study.domain.pojo" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="com.zenlong.study.domain.po" targetProject="src/main/java">
             <property name="trimStrings" value="true"/>
             <property name="enableSubPackages" value="true"/>
-            <property name="rootClass" value="com.zenlong.study.domain.pojo.BaseModel"/>
+            <property name="rootClass" value="com.zenlong.study.domain.po.BaseModel"/>
         </javaModelGenerator>
         <!-- mapper.xml -->
         <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources">
@@ -54,6 +54,10 @@
         </javaClientGenerator>
         <!-- table -->
         <table tableName="ec_user">
+            <generatedKey column="id" sqlStatement="select replace(UUID(), '-', '')" identity="false"/>
+        </table>
+        <!--camera_group-->
+        <table tableName="camera_group">
             <generatedKey column="id" sqlStatement="select replace(UUID(), '-', '')" identity="false"/>
         </table>
     </context>

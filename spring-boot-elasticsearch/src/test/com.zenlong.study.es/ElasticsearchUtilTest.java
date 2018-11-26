@@ -64,8 +64,6 @@ public class ElasticsearchUtilTest {
     public void testQueryByTerm() {
         Map map = new HashMap();
         map.put("device_no", "test01");
-        ServerResponse serverResponse = util.queryByTerm(index, type, map);
-        System.out.println("serverResponse = " + serverResponse);
     }
 
     @Test

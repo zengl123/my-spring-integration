@@ -1,7 +1,7 @@
 package com.zenlong.study;
 
 import com.zenlong.study.common.ServerResponse;
-import com.zenlong.study.domain.pojo.EcUser;
+import com.zenlong.study.domain.po.EcUser;
 
 
 /**

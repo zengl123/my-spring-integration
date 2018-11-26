@@ -1,7 +1,7 @@
 package com.zenlong.study.dao;
 
+import com.zenlong.study.domain.po.EcUser;
 import org.apache.ibatis.annotations.Param;
-import com.zenlong.study.domain.pojo.EcUser;
 import org.mybatis.generator.api.dom.java.BaseMapper;
 import org.springframework.stereotype.Component;
 

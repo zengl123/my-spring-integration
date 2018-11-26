@@ -19,6 +19,11 @@
     <dependencies>
         <dependency>
             <groupId>com.zenlong.study</groupId>
+            <artifactId>spring-boot-domain</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zenlong.study</groupId>
             <artifactId>spring-boot-dao</artifactId>
             <version>1.0</version>
         </dependency>

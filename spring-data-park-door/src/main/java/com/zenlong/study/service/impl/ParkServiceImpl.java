@@ -17,10 +17,11 @@ public class ParkServiceImpl implements IParkService {
 
     /**
      * 获取配置参数
+     *
      * @return
      */
-    private boolean init(){
-
+    private boolean init() {
+        return false;
     }
 
     /**

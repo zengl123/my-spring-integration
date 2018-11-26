@@ -5,7 +5,7 @@ import com.zenlong.study.common.ServerResponse;
 import com.zenlong.study.common.constant.Constant;
 import com.zenlong.study.common.security.Md5Util;
 import com.zenlong.study.dao.EcUserMapper;
-import com.zenlong.study.domain.pojo.EcUser;
+import com.zenlong.study.domain.po.EcUser;
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.generator.api.dom.java.BaseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class EcUserServiceImpl extends BaseServiceImpl implements IEcUserService
         ecUser.setPassword(Md5Util.Md5EncodeUtf8(ecUser.getPassword()));
         ServerResponse save = super.save(ecUser);
         if (save.isSuccess()) {
-            return ServerResponse.createBySuccessMessager("注册成功");
+            return ServerResponse.createBySuccess("注册成功");
         } else {
             return ServerResponse.createByErrorMessage("注册失败");
         }

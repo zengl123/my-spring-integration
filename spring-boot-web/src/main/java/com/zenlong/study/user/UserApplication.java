@@ -2,7 +2,7 @@ package com.zenlong.study.user;
 
 import com.zenlong.study.IEcUserService;
 import com.zenlong.study.common.ServerResponse;
-import com.zenlong.study.domain.pojo.EcUser;
+import com.zenlong.study.domain.po.EcUser;
 import com.zenlong.study.utils.ValidUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

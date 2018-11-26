@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zenlong.study.dao.EcUserMapper">
-    <resultMap id="BaseResultMap" type="com.zenlong.study.domain.pojo.EcUser">
+    <resultMap id="BaseResultMap" type="com.zenlong.study.domain.po.EcUser">
         <id column="id" property="id"/>
         <result column="user_name" property="userName"/>
         <result column="create_time" property="createTime"/>
         <result column="modified_time" property="modifiedTime"/>
+        <result column="is_deleted" property="isDeleted"/>
     </resultMap>
 
     <sql id="Table">
@@ -14,7 +15,7 @@
 
     <sql id="Base_Column_List">
         id, user_name, `password`, email, phone, question, answer, `role`, create_time, modified_time, 
-        creator, modifier
+        creator, modifier,is_deleted
     </sql>
 
     <sql id="Condition">
@@ -23,79 +24,83 @@
     </sql>
 
     <insert id="insert">
-        insert into 
+        insert into
         <include refid="Table"/>(
-        id, 
-        user_name, 
-        `password`, 
-        email, 
-        phone, 
-        question, 
-        answer, 
-        `role`, 
-        create_time, 
-        modified_time, 
-        creator, 
-        modifier
+        id,
+        user_name,
+        `password`,
+        email,
+        phone,
+        question,
+        answer,
+        `role`,
+        create_time,
+        modified_time,
+        creator,
+        modifier,
+        is_deleted
         )
         values (
-        #{id}, 
-        #{userName}, 
-        #{password}, 
-        #{email}, 
-        #{phone}, 
-        #{question}, 
-        #{answer}, 
-        #{role}, 
-        now(), 
-        now(), 
-        #{creator}, 
-        #{modifier}
+        #{id},
+        #{userName},
+        #{password},
+        #{email},
+        #{phone},
+        #{question},
+        #{answer},
+        #{role},
+        now(),
+        now(),
+        #{creator},
+        #{modifier},
+        #{isDeleted}
         )
     </insert>
 
     <insert id="insertBatch">
-        insert into 
+        insert into
         <include refid="Table"/>(
-        id, 
-        user_name, 
-        `password`, 
-        email, 
-        phone, 
-        question, 
-        answer, 
-        `role`, 
-        create_time, 
-        modified_time, 
-        creator, 
-        modifier
+        id,
+        user_name,
+        `password`,
+        email,
+        phone,
+        question,
+        answer,
+        `role`,
+        create_time,
+        modified_time,
+        creator,
+        modifier,
+        is_deleted
         )
         values
         <foreach collection="list" item="obj" separator=",">(
-            (select replace(UUID(), '-', '') as id), 
-            #{obj.userName}, 
-            #{obj.password}, 
-            #{obj.email}, 
-            #{obj.phone}, 
-            #{obj.question}, 
-            #{obj.answer}, 
-            #{obj.role}, 
-            now(), 
-            now(), 
-            #{obj.creator}, 
-            #{obj.modifier}
+            (select replace(UUID(), '-', '') as id),
+            #{obj.userName},
+            #{obj.password},
+            #{obj.email},
+            #{obj.phone},
+            #{obj.question},
+            #{obj.answer},
+            #{obj.role},
+            now(),
+            now(),
+            #{obj.creator},
+            #{obj.modifier},
+            #{obj.isDeleted}
             )
         </foreach>
     </insert>
 
     <delete id="deleteById">
-        delete from 
+        delete from
         <include refid="Table"/>
         where id = #{id}
     </delete>
 
     <delete id="deleteByIds">
-        delete from 
+        delete from
         <include refid="Table"/>
         where id in
         <foreach collection="list" item="id" separator="," open="(" close=")">
@@ -104,7 +109,7 @@
     </delete>
 
     <update id="update">
-        update 
+        update
         <include refid="Table"/>
         <set>
             <if test="userName!=null">user_name=#{userName},</if>
@@ -116,12 +121,13 @@
             <if test="role!=null">`role`=#{role},</if>
             modified_time=now(),
             <if test="modifier!=null">modifier=#{modifier},</if>
+            <if test="isDeleted!=null">is_deleted=#{isDeleted}</if>
         </set>
         where id = #{id}
     </update>
 
     <update id="updateBatch">
-        update 
+        update
         <include refid="Table"/>
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="user_name=case" suffix="end,">
@@ -185,6 +191,13 @@
                     </if>
                 </foreach>
             </trim>
+            <trim prefix="is_deleted=case" suffix="end,">
+                <foreach collection="list" item="obj">
+                    <if test="obj.isDeleted!=null">
+                        when id=#{obj.id} then #{obj.isDeleted}
+                    </if>
+                </foreach>
+            </trim>
         </trim>
         where id in
         <foreach collection="list" item="obj" separator="," open="(" close=")">
@@ -193,17 +206,17 @@
     </update>
 
     <select id="findById" resultMap="BaseResultMap">
-        select 
+        select
         <include refid="Base_Column_List"/>
-        from 
+        from
         <include refid="Table"/>
         where id = #{id}
     </select>
 
     <select id="findByIds" resultMap="BaseResultMap">
-        select 
+        select
         <include refid="Base_Column_List"/>
-        from 
+        from
         <include refid="Table"/>
         where id in
         <foreach collection="list" item="id" separator="," open="(" close=")">
@@ -212,9 +225,9 @@
     </select>
 
     <select id="findAll" resultMap="BaseResultMap">
-        select 
+        select
         <include refid="Base_Column_List"/>
-        from 
+        from
         <include refid="Table"/>
     </select>
 

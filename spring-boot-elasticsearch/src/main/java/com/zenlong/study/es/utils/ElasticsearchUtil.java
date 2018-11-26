@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zenlong.study.common.ServerResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -17,18 +18,9 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,9 +50,8 @@ public class ElasticsearchUtil {
     public boolean isIndexExist(String index) throws Exception {
         GetIndexRequest request = new GetIndexRequest();
         request.indices(index);
-        request.local(false);
         request.humanReadable(true);
-        boolean exists = highLevelClient.indices().exists(request,RequestOptions.DEFAULT);
+        boolean exists = highLevelClient.indices().exists(request, RequestOptions.DEFAULT);
         return exists;
     }
 
@@ -76,7 +67,7 @@ public class ElasticsearchUtil {
         IndexRequest request = new IndexRequest(index, type);
         request.source(requestBody, XContentType.JSON);
         try {
-            IndexResponse indexResponse = highLevelClient.index(request);
+            IndexResponse indexResponse = highLevelClient.index(request, RequestOptions.DEFAULT);
             String id = indexResponse.getId();
             return ServerResponse.createBySuccess(id);
         } catch (IOException e) {
@@ -96,8 +87,8 @@ public class ElasticsearchUtil {
     public ServerResponse deletedById(String index, String type, String id) {
         DeleteRequest deleteRequest = new DeleteRequest(index, type, id);
         try {
-            DeleteResponse delete = highLevelClient.delete(deleteRequest);
-            return ServerResponse.createBySuccess();
+            DeleteResponse delete = highLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
+            return ServerResponse.createBySuccess(delete.getId());
         } catch (IOException e) {
             log.error(e.getMessage());
             return ServerResponse.createByErrorMessage(e.getMessage());
@@ -109,9 +100,20 @@ public class ElasticsearchUtil {
      *
      * @return
      */
-    public ServerResponse bulk() {
-        //BulkResponse bulkResponse = highLevelClient.bulk(request);
-        return null;
+    public <T> ServerResponse bulk(String index, String type, List<T> list) {
+        BulkRequest bulkRequest = new BulkRequest();
+        list.stream().forEach(t -> {
+            IndexRequest indexRequest = new IndexRequest(index, type);
+            indexRequest.source(t, XContentType.JSON);
+            bulkRequest.add(indexRequest);
+        });
+        try {
+            BulkResponse bulk = highLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+            return ServerResponse.createBySuccess(bulk.hasFailures());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return ServerResponse.createByErrorMessage(e.getMessage());
+        }
     }
 
     /**
@@ -125,7 +127,7 @@ public class ElasticsearchUtil {
     public ServerResponse getById(String index, String type, String id) {
         GetRequest getRequest = new GetRequest(index, type, id);
         try {
-            GetResponse documentFields = highLevelClient.get(getRequest);
+            GetResponse documentFields = highLevelClient.get(getRequest, RequestOptions.DEFAULT);
             Map<String, Object> source = documentFields.getSource();
             return ServerResponse.createBySuccess(source);
         } catch (IOException e) {
@@ -137,42 +139,32 @@ public class ElasticsearchUtil {
     /**
      * 根据条件查询
      *
-     * @param termMap
+     * @param searchRequest
      * @return
      */
-    public ServerResponse<List<Map>> queryByTerm(String index, String type, Map<String, String> termMap) {
-        return queryByTerm(index, type, termMap, Map.class);
+    public ServerResponse<List<Map>> queryByTerm(SearchRequest searchRequest) throws IOException {
+        return queryByTerm(searchRequest, Map.class);
     }
 
-    /**
-     * 根据条件查询
-     *
-     * @param termMap
-     * @return
-     */
-    public <T> ServerResponse<List<T>> queryByTerm(String index, String type, Map<String, String> termMap, Class<T> tClass) {
-        if (null == termMap || termMap.isEmpty()) {
-            ServerResponse.createByErrorMessage("查询条件不能为空");
-        }
-        SearchRequest searchRequest = new SearchRequest(index, type);
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        termMap.forEach((k, v) -> {
-            TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery(k, v);
-            boolQueryBuilder.must(termQueryBuilder);
-        });
-        searchSourceBuilder.query(boolQueryBuilder);
-        searchRequest.source(searchSourceBuilder);
-        try {
-            SearchResponse search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = search.getHits();
-            List<T> collect = Stream.of(hits.getHits())
-                    .map(hit -> JSON.parseObject(hit.getSourceAsString(), tClass))
-                    .collect(Collectors.toList());
-            return ServerResponse.createBySuccess(collect);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return ServerResponse.createByErrorMessage("");
-        }
+    public <T> ServerResponse<List<T>> queryByTerm(SearchRequest searchRequest, Class<T> tClass) throws IOException {
+        SearchResponse search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = search.getHits();
+        List<T> collect = Stream.of(hits.getHits())
+                .map(hit -> {
+                    String id = hit.getId();
+                    String sourceAsString = hit.getSourceAsString();
+                    JSONObject object = JSON.parseObject(sourceAsString);
+                    object.put("id", id);
+                    return JSON.toJavaObject(object, tClass);
+                })
+                .collect(Collectors.toList());
+        return ServerResponse.createBySuccess(collect);
+    }
+
+    public <T> ServerResponse<List<T>> queryByTermNoId(SearchRequest searchRequest, Class<T> tClass) throws IOException {
+        SearchResponse search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = search.getHits();
+        List<T> collect = Stream.of(hits.getHits()).map(hit -> (JSON.parseObject(hit.getSourceAsString(), tClass))).collect(Collectors.toList());
+        return ServerResponse.createBySuccess(collect);
     }
 }

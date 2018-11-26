@@ -1,4 +1,4 @@
-package com.zenlong.study.domain.pojo;
+package com.zenlong.study.domain.po;
 
 import lombok.Data;
 

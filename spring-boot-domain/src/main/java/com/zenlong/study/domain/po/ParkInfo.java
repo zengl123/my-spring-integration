@@ -1,4 +1,4 @@
-package com.zenlong.study.domain.pojo;
+package com.zenlong.study.domain.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.zenlong.study.domain.BaseModel;
@@ -12,7 +12,7 @@ import lombok.Data;
  * @Created 2018/10/23  15:42.
  */
 @Data
-public class ParkInfoPo extends BaseModel {
+public class ParkInfo extends BaseModel {
     /**
      * 停车场编号
      */

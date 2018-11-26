@@ -16,11 +16,4 @@
     <version>1.0</version>
     <name>spring-boot-domain</name>
 
-    <properties>
-    </properties>
-
-    <dependencies>
-
-    </dependencies>
-
 </project>

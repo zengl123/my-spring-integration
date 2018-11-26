@@ -1,4 +1,4 @@
-package com.zenlong.study.domain.pojo;
+package com.zenlong.study.domain.po;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import lombok.Data;
  * @Created 2018/10/23  17:46.
  */
 @Data
-public class ParkRecordPo {
+public class ParkRecord {
     /**
      * 通行时间
      */
