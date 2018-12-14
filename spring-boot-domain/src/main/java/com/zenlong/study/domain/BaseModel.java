@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Data
 public class BaseModel implements Serializable {
     private static final long serialVersionUID = 1L;
-    @ApiModelProperty(value = "主键")
+    @ApiModelProperty(value = "主键", hidden = true)
     private String id;
     @ApiModelProperty(value = "创建者", hidden = true)
     private String creator = "SYSTEM";
@@ -30,4 +30,6 @@ public class BaseModel implements Serializable {
     private String modifiedTime;
     @ApiModelProperty(value = "是否已删除", hidden = true)
     private String isDeleted = "N";
+    @ApiModelProperty(value = "排序", hidden = true)
+    private Integer sort;
 }

@@ -4,15 +4,17 @@ import com.zenlong.study.common.excpetion.CusException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.junit.Test;
 
 import java.sql.Time;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
- * @Description
+ * @Description 时间工具类
  * @Project my-spring-integration
  * @Package com.zenlong.study.common.utils
  * @ClassName DateTimeUtil
@@ -323,14 +325,23 @@ public class DateTimeUtil {
     /**
      * 将long型时间戳转化为日期(年月日)
      *
-     * @param timemillis 时间戳
+     * @param timeMillis 时间戳
      * @return 转化好的日期(年月日)
      */
-    public static String formatLongToDate(long timemillis) {
-        if (timemillis == 0) {
+    public static String formatLongToDate(long timeMillis) {
+        if (timeMillis == 0) {
             return StringUtils.EMPTY;
         }
-        return DATE_FORMAT_CHINA_FORMAT_DATETIME_PATTERN.format(new Date(timemillis));
+        return DATE_FORMAT_CHINA_FORMAT_DATETIME_PATTERN.format(new Date(timeMillis));
+    }
+
+    /**
+     * 获取当前日期 （yyyy-MM-dd HH:mm:ss）
+     *
+     * @return String
+     */
+    public static String getCurrentDatetime() {
+        return DATE_FORMAT_YYYY_MM_DD_HH_MM_SS.format(new Date());
     }
 }
 

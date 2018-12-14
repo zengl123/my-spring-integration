@@ -1,6 +1,7 @@
-package com.zenlong.study.user;
+package com.zenlong.study.api.user;
 
 import com.zenlong.study.IEcUserService;
+import com.zenlong.study.annotation.SysLog;
 import com.zenlong.study.common.ServerResponse;
 import com.zenlong.study.domain.po.EcUser;
 import com.zenlong.study.utils.ValidUtil;
@@ -34,7 +35,8 @@ public class UserApplication {
     @Autowired
     private IEcUserService service;
 
-    @ApiOperation(value = "register", notes = "用户注册")
+    @SysLog("用户注册")
+    @ApiOperation(value = "用户注册", notes = "register")
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public ServerResponse register(@RequestBody @Valid EcUser ecUser, BindingResult bindingResult) {
         ServerResponse serverResponse = ValidUtil.requestBodyValid(bindingResult);

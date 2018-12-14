@@ -13,7 +13,6 @@ package com.zenlong.study.common.constant;
 public class Constant {
 
     public static final String CURRENT_USER = "currentUser";
-
     public static final String EMAIL = "email";
     public static final String USER_NAME = "userName";
     public static final String PHONE = "phone";

@@ -1,6 +1,7 @@
 package com.zenlong.study.common.excpetion;
 
 import com.zenlong.study.common.ServerResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,7 @@ import java.lang.reflect.Method;
  * @Version 1.0
  * @Modified By
  */
+@Slf4j
 @RestControllerAdvice
 public class ExceptionUtil {
 
@@ -35,11 +37,6 @@ public class ExceptionUtil {
      * 发生ServletException异常时使用的方法名-用来获取发生Servlet异常的原因。
      */
     private static final String GET_ROOT_CAUSE = "getRootCause";
-
-    /**
-     * 日志类。
-     */
-    private static Logger log = LoggerFactory.getLogger(ExceptionUtil.class);
 
     /**
      * 获取指定异常的堆栈追踪信息。
@@ -92,5 +89,4 @@ public class ExceptionUtil {
         String stackTrace = getStackTrace(cause);
         return ServerResponse.createByErrorMessage("异常:"+stackTrace);
     }
-
 }

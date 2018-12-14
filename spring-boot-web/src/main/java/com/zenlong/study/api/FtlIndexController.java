@@ -1,7 +1,11 @@
 package com.zenlong.study.api;
 
-import org.springframework.stereotype.Controller;
+import com.alibaba.fastjson.JSONObject;
+import com.zenlong.study.annotation.SysLog;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 
 /**
  * @Description
@@ -14,10 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Version 1.0
  * @Modified By
  */
-@Controller
+@RestController
 public class FtlIndexController {
+    @SysLog("登陆")
     @RequestMapping(value = "/ftlIndex")
-    public String ftlIndex(){
-        return "ftlIndex";
+    public String ftlIndex(@RequestBody(required = false) JSONObject requestBody) {
+        return "index";
     }
 }

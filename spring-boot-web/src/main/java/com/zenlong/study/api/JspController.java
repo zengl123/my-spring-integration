@@ -1,7 +1,9 @@
 package com.zenlong.study.api;
 
+import com.zenlong.study.annotation.SysLog;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @Description
@@ -14,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Version 1.0
  * @Modified By
  */
-@Controller
+@RestController
 public class JspController {
+    @SysLog("退出")
     @RequestMapping(value = "/index")
-    public String jspIndex(){
+    public String jspIndex() {
         return "index";
     }
 }

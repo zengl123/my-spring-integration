@@ -60,12 +60,12 @@ public class ElasticsearchUtil {
      *
      * @param index
      * @param type
-     * @param requestBody
+     * @param t
      * @return
      */
-    public ServerResponse insert(String index, String type, JSONObject requestBody) {
+    public <T> ServerResponse insert(String index, String type, T t) {
         IndexRequest request = new IndexRequest(index, type);
-        request.source(requestBody, XContentType.JSON);
+        request.source(String.valueOf(t), XContentType.JSON);
         try {
             IndexResponse indexResponse = highLevelClient.index(request, RequestOptions.DEFAULT);
             String id = indexResponse.getId();
@@ -104,7 +104,7 @@ public class ElasticsearchUtil {
         BulkRequest bulkRequest = new BulkRequest();
         list.stream().forEach(t -> {
             IndexRequest indexRequest = new IndexRequest(index, type);
-            indexRequest.source(t, XContentType.JSON);
+            indexRequest.source(String.valueOf(t), XContentType.JSON);
             bulkRequest.add(indexRequest);
         });
         try {

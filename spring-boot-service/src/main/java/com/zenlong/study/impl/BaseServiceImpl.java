@@ -160,9 +160,4 @@ public abstract class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseMod
         List<T> all = getMapper().findAll();
         return ServerResponse.createBySuccess(all, "查询成功");
     }
-
-    public static void main(String[] args) {
-        Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
-        logger.info("s");
-    }
 }

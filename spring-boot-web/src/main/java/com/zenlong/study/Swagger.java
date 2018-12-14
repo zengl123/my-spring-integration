@@ -38,7 +38,7 @@ public class Swagger {
     }
 
     private ApiInfo apiInfo() {
-        Contact contact = new Contact("作者名",
+        Contact contact = new Contact("曾灵",
                 "", "17363645521@163.com");
         return new ApiInfoBuilder()
                 .title("电商模块接口开发文档")

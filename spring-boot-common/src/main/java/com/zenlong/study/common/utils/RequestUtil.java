@@ -29,8 +29,8 @@ public final class RequestUtil {
             return null;
         }
         // 取得pathInfo
-        return ((HttpServletRequest)request).getRequestURI()
-                .replaceFirst(((HttpServletRequest)request).getContextPath(), "");
+        return ((HttpServletRequest) request).getRequestURI()
+                .replaceFirst(((HttpServletRequest) request).getContextPath(), "");
     }
 
     /**
@@ -129,45 +129,33 @@ public final class RequestUtil {
      * @return 消除后的URL
      */
     public static String deleteUrlParam(String url, String key) {
-
         // url,key为NULL时，直接返回URL
         if (url == null || "".equals(url) || key == null || "".equals(key)) {
             return url;
         }
-
         // 取得参数开始位置'?'的index
         int start = url.indexOf("?");
-
         // 用于返回数据的StringBuilder
         StringBuilder returnUrl = new StringBuilder(url);
-
         // 存在参数时
         if (start >= 0) {
-
             // 取得参数列表
             String tmp = url.substring(start + 1);
-
             // 保存非参数部分
             returnUrl = new StringBuilder(url.substring(0, start));
-
             // 转换为参数数组
             String[] params = tmp.split("&");
-
             // 遍历参数数组，并保存指定key以外参数
             for (String param : params) {
                 // 是否为指定key
                 if (!param.startsWith(key + "=")) {
-
                     // 首个参数时追加字符'?'
                     // 非首个参数时追加字符'&'
-                    if (returnUrl.indexOf("?") < 0 && !returnUrl.toString()
-                            .endsWith("?")) {
+                    if (returnUrl.indexOf("?") < 0 && !returnUrl.toString().endsWith("?")) {
                         returnUrl.append("?");
-                    } else if (!returnUrl.toString()
-                            .endsWith("&")) {
+                    } else if (!returnUrl.toString().endsWith("&")) {
                         returnUrl.append("&");
                     }
-
                     // 保存参数
                     returnUrl.append(param);
                 }

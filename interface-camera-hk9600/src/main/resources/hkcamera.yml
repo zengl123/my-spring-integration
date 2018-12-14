@@ -1,0 +1,11 @@
+tdp:
+  interface:
+    #平台接口地址
+    camera-url-thy:
+    camera-url-sgx:
+    camera-url-gtgz: http://10.2.3.3/cms/services/ICommonService?wsdl
+    #
+    node-index-code-thy:
+    node-index-code-sgx:
+    node-index-code-gtgz: 001058
+

@@ -13,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +97,16 @@ public class DispatcherServletConfig extends WebMvcConfigurationSupport {
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(getFastJsonHttpMessageConverter());
         super.configureMessageConverters(converters);
+    }
+
+    @Bean
+    public InternalResourceViewResolver setupViewResolver() {
+        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+        //设置视图路径的前缀
+        resolver.setPrefix("/WEB-INF/view/");
+        //设置视图路径的后缀
+        resolver.setSuffix(".jsp");
+        return resolver;
     }
 
     /**
