@@ -87,6 +87,7 @@ public class ExceptionUtil {
         e.printStackTrace();
         Throwable cause = e.getCause();
         String stackTrace = getStackTrace(cause);
-        return ServerResponse.createByErrorMessage("异常:"+stackTrace);
+        log.error("程序异常:{}", stackTrace);
+        return ServerResponse.createByErrorMessage("程序异常");
     }
 }

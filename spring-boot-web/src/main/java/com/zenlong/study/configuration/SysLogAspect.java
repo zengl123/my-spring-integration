@@ -2,7 +2,7 @@ package com.zenlong.study.configuration;
 
 import com.google.gson.Gson;
 import com.zenlong.study.annotation.SysLog;
-import com.zenlong.study.common.utils.DateTimeUtil;
+import com.zenlong.study.common.utils.IpUtil;
 import com.zenlong.study.domain.SysLogBO;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,11 +16,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,7 +56,7 @@ public class SysLogAspect {
         try {
             saveLog(point, time);
         } catch (Exception e) {
-            log.error("", e.getMessage());
+            log.error("SysLogAspect...日志存储异常:{}", e.getMessage());
         }
         return result;
     }
@@ -74,7 +72,7 @@ public class SysLogAspect {
         Method method = signature.getMethod();
         SysLogBO sysLogBO = new SysLogBO();
         sysLogBO.setExecutionTime(time);
-        sysLogBO.setCreateDate(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        sysLogBO.setCreateTime(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         SysLog sysLog = method.getAnnotation(SysLog.class);
         if (sysLog != null) {
             //注解上的描述
@@ -84,7 +82,8 @@ public class SysLogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         StringBuffer requestURL = request.getRequestURL();
-        sysLogBO.setAddress(requestURL.toString());
+        sysLogBO.setRequestUrl(requestURL.toString());
+        sysLogBO.setIpAddress(IpUtil.getIpAddress(request));
         //请求的 类名、方法名
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = signature.getName();
@@ -97,10 +96,10 @@ public class SysLogAspect {
             for (Object o : args) {
                 list.add(new Gson().toJson(o));
             }
-            sysLogBO.setParams(list.toString());
+            sysLogBO.setRequestBody(list.toString());
         } catch (Exception e) {
+            log.error("解析请求参数异常:{}", e.getMessage());
         }
-
         //sysLogService.save(sysLogBO);
         System.out.println("sysLogBO = " + sysLogBO);
     }

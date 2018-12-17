@@ -1,8 +1,14 @@
 package com.zenlong.study.domain.po;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.gson.annotations.SerializedName;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.eclipse.sisu.Hidden;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -16,50 +22,66 @@ import java.time.format.DateTimeFormatter;
  * @Created 2018/11/27  9:29.
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
+@Document(indexName = "index_gps_record", type = "doc")
 public class GpsRecord implements Serializable {
-    private transient String id;
-    public static transient String index = "indexgpsrecord";
-    public static transient String type = "gps_record";
+    /**
+     * 主键id
+     */
+    @Id
+    private String id;
     /**
      * 设备编号
      */
-    @JSONField(name = "device_no")
+    //@SerializedName(value = "device_no")
+    @Field
     private String deviceNo;
     /**
      * 设备名称
      */
-    @JSONField(name = "device_name")
+    //@SerializedName(value = "device_name")
+    @Field
     private String deviceName;
     /**
      * 经度
      */
+    @Field
     private String longitude;
     /**
      * 纬度
      */
+    @Field
     private String latitude;
-    @JSONField(name = "gps_time")
     /**
-     * 数据产生时间
+     * 数据产生时间(String展示Long计算)
      */
+    //@SerializedName(value = "gps_time")
+    @Field
     private String gpsTime;
+    //@SerializedName(value = "gps_time_long")
+    @Field
+    private Long gpsTimeLong;
     /**
      * 数据写入时间
      */
-    @JSONField(name = "create_time")
+    @Field
     private String createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    @Field
     private int speed;
     /**
      * 方向
      */
+    //@SerializedName(value = "direction_no")
+    @Field
     private int directionNo;
     /**
      * 方向名称
      */
+    @Transient
     private String directionName;
     /**
      * 海拔
      */
+    @Field
     private int elevation;
 }

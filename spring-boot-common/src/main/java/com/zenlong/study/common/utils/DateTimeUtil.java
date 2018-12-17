@@ -10,6 +10,10 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -109,6 +113,23 @@ public class DateTimeUtil {
      * 日期格式 yyyyMMdd
      */
     public static final FastDateFormat DATE_FORMAT_YYYYMMDD = FastDateFormat.getInstance(YYYYMMDD);
+
+    /**
+     * 日期格式化
+     *
+     * @param pattern
+     * @return
+     */
+    public static DateTimeFormatter dtf(String pattern) {
+        DateTimeFormatter dtf = new DateTimeFormatterBuilder().append(DateTimeFormatter.ofPattern(pattern))
+                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 0)
+                .parseDefaulting(ChronoField.DAY_OF_MONTH, 0)
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                .toFormatter();
+        return dtf;
+    }
 
     /**
      * 计算相差天数
@@ -342,6 +363,17 @@ public class DateTimeUtil {
      */
     public static String getCurrentDatetime() {
         return DATE_FORMAT_YYYY_MM_DD_HH_MM_SS.format(new Date());
+    }
+
+    /**
+     * 将日期时间字符串转为毫秒数
+     *
+     * @param dateTimeString
+     * @return 1514736000000
+     */
+    public static long stringToMilli(String dateTimeString) {
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString, dtf(YYYY_MM_DD_HH_MM_SS));
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }
 
