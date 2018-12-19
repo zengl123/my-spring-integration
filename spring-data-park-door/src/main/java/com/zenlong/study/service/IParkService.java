@@ -1,7 +1,10 @@
 package com.zenlong.study.service;
 
 import com.zenlong.study.common.ServerResponse;
-import com.zenlong.study.domain.vo.ParkInfoVo;
+import com.zenlong.study.domain.po.ParkExportRecord;
+import com.zenlong.study.domain.po.ParkInfo;
+
+import java.util.List;
 
 /**
  * 描述:道尔停车场数据对接接口
@@ -16,7 +19,12 @@ public interface IParkService {
      *
      * @return
      */
-    ServerResponse<ParkInfoVo> listParkInfo();
+    ServerResponse<List<ParkInfo>> listParkInfo();
 
-
+    /**
+     * 进场记录
+     *
+     * @return
+     */
+    ServerResponse<List<ParkExportRecord>> listParkExport();
 }

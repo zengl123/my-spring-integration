@@ -27,15 +27,15 @@ public class ParkInfo extends BaseModel {
      * 车位总数
      */
     @JSONField(name = "park_total_num")
-    private String parkTotalNum;
+    private Integer parkTotalNum;
     /**
      * 已使用车位数
      */
     @JSONField(name = "park_used_num")
-    private String parkUsedNum;
+    private Integer parkUsedNum;
     /**
      * 剩余车位数
      */
     @JSONField(name = "park_remainder_num")
-    private String parkRemainderNum;
+    private Integer parkRemainderNum;
 }

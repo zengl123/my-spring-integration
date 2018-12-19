@@ -2,10 +2,7 @@ package com.zenlong.study.common.httpclient;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.http.Consts;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
@@ -370,12 +367,11 @@ public enum HttpClientUtil {
             int status = response.getStatusLine().getStatusCode();
             String content = EntityUtils.toString(response.getEntity(), charset);
             logger.debug("uri:{}, statusCode:{}", uri, status);
-            if (status < 200 || status > 400) {
+            if (status < HttpStatus.SC_OK || status > HttpStatus.SC_BAD_REQUEST) {
                 logger.debug("HTTP exception, statusCode:{}, content:{}", status, content);
             }
             result = new Result(status, content);
         } catch (Exception e) {
-            logger.error("", e);
             result = new Result(0, e.getMessage());
         } finally {
             if (null != response) {

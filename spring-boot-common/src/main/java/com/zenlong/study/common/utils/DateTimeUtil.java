@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @Description 时间工具类
@@ -375,5 +376,35 @@ public class DateTimeUtil {
         LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString, dtf(YYYY_MM_DD_HH_MM_SS));
         return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
+
+    /**
+     * 标准时间格式的字符串 加|减 day
+     *
+     * @param stringTime
+     * @param day
+     * @return
+     */
+    public static String stringMinusOrPlusDay(String stringTime, int day) {
+        LocalDateTime localDateTime = getDateTimeOfString(stringTime, YYYY_MM_DD_HH_MM_SS);
+        localDateTime = localDateTime.plusDays(day);
+        return getStringOfDateTime(localDateTime, YYYY_MM_DD_HH_MM_SS);
+    }
+
+    public static LocalDateTime getDateTimeOfString(String strTime, String pattern) {
+        return LocalDateTime.parse(strTime, dtf(pattern));
+    }
+
+    /**
+     * 将LocalDateTime转为自定义的时间格式的字符串
+     *
+     * @param localDateTime
+     * @param pattern
+     * @return
+     */
+    public static String getStringOfDateTime(LocalDateTime localDateTime, String pattern) {
+        String format = localDateTime.format(dtf(pattern));
+        return format;
+    }
+
 }
 
