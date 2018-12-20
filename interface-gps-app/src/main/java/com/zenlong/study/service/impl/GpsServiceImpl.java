@@ -40,6 +40,6 @@ public class GpsServiceImpl implements IGpsService {
         GpsRecord gpsRecord = new GpsRecord();
         BeanUtils.copyProperties(data, gpsRecord);
         redisUtil.set(Constant.REDIS_GPS_REAL_TIME + gpsRecord.getDeviceNo(), String.valueOf(gpsRecord));
-        return elasticsearchUtil.insert(GpsRecord.index, GpsRecord.type, gpsRecord);
+        return elasticsearchUtil.insert(GpsRecord.INDEX, GpsRecord.TYPE, gpsRecord);
     }
 }

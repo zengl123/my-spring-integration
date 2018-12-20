@@ -156,8 +156,7 @@ public class ElasticsearchUtil {
                     JSONObject object = JSON.parseObject(sourceAsString);
                     object.put("id", id);
                     return JSON.toJavaObject(object, tClass);
-                })
-                .collect(Collectors.toList());
+                }).collect(Collectors.toList());
         return ServerResponse.createBySuccess(collect);
     }
 

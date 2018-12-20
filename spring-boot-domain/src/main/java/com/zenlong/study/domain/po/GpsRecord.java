@@ -1,10 +1,7 @@
 package com.zenlong.study.domain.po;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.gson.annotations.SerializedName;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.eclipse.sisu.Hidden;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -23,8 +20,10 @@ import java.time.format.DateTimeFormatter;
  */
 @Data
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-@Document(indexName = "index_gps_record", type = "doc")
+@Document(indexName = "index_gps_record", type = "type_gps_record")
 public class GpsRecord implements Serializable {
+    public final static transient String INDEX = "index_gps_record";
+    public final static transient String TYPE = "type_gps_record";
     /**
      * 主键id
      */

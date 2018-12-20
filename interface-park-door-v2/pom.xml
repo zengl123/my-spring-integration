@@ -11,30 +11,25 @@
     </parent>
 
     <groupId>com.zenlong.study</groupId>
-    <artifactId>spring-boot-elasticsearch</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>interface-park-door-v2</artifactId>
     <version>1.0</version>
-    <name>spring-boot-elasticsearch</name>
-    <description>Elasticsearch工具类</description>
-
-    <properties>
-        <elasticsearch.version>6.5.3</elasticsearch.version>
-    </properties>
+    <packaging>jar</packaging>
+    <name>interface-park-door-v2</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-            <version>${elasticsearch.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.elasticsearch.client</groupId>
-            <artifactId>elasticsearch-rest-high-level-client</artifactId>
-            <version>${elasticsearch.version}</version>
+            <groupId>com.zenlong.study</groupId>
+            <artifactId>spring-boot-domain</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.zenlong.study</groupId>
             <artifactId>spring-boot-common</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zenlong.study</groupId>
+            <artifactId>spring-boot-elasticsearch</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

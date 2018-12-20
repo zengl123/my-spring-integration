@@ -10,14 +10,16 @@
         <module>spring-boot-service</module>
         <module>spring-boot-dao</module>
         <module>spring-boot-web</module>
+        <module>spring-boot-interface</module>
         <module>spring-boot-redis</module>
         <module>spring-boot-elasticsearch</module>
-        <module>spring-boot-data-jt808</module>
-        <module>spring-data-park-door</module>
+        <module>interface-gps-jt808</module>
+        <module>interface-park-door-v2</module>
         <module>interface-camera-hk9600</module>
         <module>interface-gps-app</module>
         <module>interface-camera-hk7600</module>
         <module>interface-alarm-hk7600</module>
+        <module>interface-hk8700</module>
     </modules>
 
     <parent>
@@ -125,15 +127,9 @@
             <version>${common.collections.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mybatis.generator</groupId>
-            <artifactId>mybatis-generator-maven-plugin</artifactId>
-            <version>${mybatis-generator-maven-plugin.version}</version>
-        </dependency>
-        <!--spring-boot整合mybatis -->
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>1.1.1</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
@@ -151,5 +147,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

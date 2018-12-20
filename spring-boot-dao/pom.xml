@@ -16,6 +16,17 @@
 	<name>spring-boot-dao</name>
 	
 	<dependencies>
+		<dependency>
+			<groupId>org.mybatis.generator</groupId>
+			<artifactId>mybatis-generator-maven-plugin</artifactId>
+			<version>${mybatis-generator-maven-plugin.version}</version>
+		</dependency>
+		<!--spring-boot整合mybatis -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 		<!--spring整合elasticsearch包-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -34,7 +34,7 @@ public class GpsController {
     }
 
     @RequestMapping(value = "listDeviceInfoByDate")
-    public ServerResponse listDeviceInfoByDate() {
-        return service.listDeviceInfoByDate();
+    public ServerResponse listDeviceInfoByDate(@RequestBody JSONObject requestBody) {
+        return service.listDeviceInfoByDate(requestBody);
     }
 }

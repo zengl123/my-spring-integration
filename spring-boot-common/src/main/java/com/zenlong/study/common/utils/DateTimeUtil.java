@@ -378,6 +378,18 @@ public class DateTimeUtil {
     }
 
     /**
+     * 获取指定时间time --second秒前/后 时间
+     *
+     * @param time
+     * @param second
+     * @return 返回格式 yyyy-MM-dd HH:mm:ss
+     */
+    public static String stringMinusOrPlusSecond(String time, int second) {
+        DateTimeFormatter f = DateTimeFormatter.ofPattern(YYYY_MM_DD_HH_MM_SS);
+        LocalDateTime localDateTime = second > 0 ? LocalDateTime.parse(time, f).plusSeconds(second) : LocalDateTime.parse(time, f).minusSeconds(Math.abs(second));
+        return localDateTime.format(f);
+    }
+    /**
      * 标准时间格式的字符串 加|减 day
      *
      * @param stringTime

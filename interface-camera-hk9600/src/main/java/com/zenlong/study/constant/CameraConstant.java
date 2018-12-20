@@ -8,5 +8,5 @@ package com.zenlong.study.constant;
  * @Created 2018/12/10  15:57.
  */
 public interface CameraConstant {
-    Integer interfaceResponseSuccessCode = 0;
+    Integer INTERFACE_RESPONSE_SUCCESSCODE = 0;
 }
