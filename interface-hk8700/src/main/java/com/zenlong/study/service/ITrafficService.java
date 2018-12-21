@@ -15,7 +15,7 @@ public interface ITrafficService {
      *
      * @return
      */
-    ServerResponse dataSync();
+    ServerResponse dataCurrentTimeSync();
 
     /**
      * 客流量天数据

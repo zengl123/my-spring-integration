@@ -22,7 +22,5 @@ public class TrafficPointInfo extends BaseModel {
     private String deviceNo;
     @JSONField(name = "device_name")
     private String deviceName;
-    private String ip;
-    private Integer chanel;
     private Integer peak;
 }

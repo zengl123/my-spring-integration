@@ -3,6 +3,7 @@ package com.zenlong.study.es.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zenlong.study.common.ServerResponse;
+import com.zenlong.study.common.excpetion.ExceptionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -104,7 +105,7 @@ public class ElasticsearchUtil {
         BulkRequest bulkRequest = new BulkRequest();
         list.stream().forEach(t -> {
             IndexRequest indexRequest = new IndexRequest(index, type);
-            indexRequest.source(String.valueOf(t), XContentType.JSON);
+            indexRequest.source(t, XContentType.JSON);
             bulkRequest.add(indexRequest);
         });
         try {
@@ -146,8 +147,14 @@ public class ElasticsearchUtil {
         return queryByTerm(searchRequest, Map.class);
     }
 
-    public <T> ServerResponse<List<T>> queryByTerm(SearchRequest searchRequest, Class<T> tClass) throws IOException {
-        SearchResponse search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+    public <T> ServerResponse<List<T>> queryByTerm(SearchRequest searchRequest, Class<T> tClass) {
+        log.debug("sql:{}", searchRequest);
+        SearchResponse search;
+        try {
+            search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (Exception e) {
+            return ServerResponse.createByErrorMessage(ExceptionUtil.hand(e).getMessage());
+        }
         SearchHits hits = search.getHits();
         List<T> collect = Stream.of(hits.getHits())
                 .map(hit -> {

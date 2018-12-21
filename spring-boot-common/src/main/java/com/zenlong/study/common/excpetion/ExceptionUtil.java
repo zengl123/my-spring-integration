@@ -1,17 +1,21 @@
 package com.zenlong.study.common.excpetion;
 
+import com.alibaba.fastjson.JSONObject;
 import com.zenlong.study.common.ServerResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Description 异常处理相关的工具类。
@@ -84,10 +88,26 @@ public class ExceptionUtil {
 
     @ExceptionHandler(Exception.class)
     public ServerResponse handException(Exception e) {
-        e.printStackTrace();
-        Throwable cause = e.getCause();
-        String stackTrace = getStackTrace(cause);
-        log.error("程序异常:{}", stackTrace);
+        log.error("程序异常:{}", hand(e).getMessage());
         return ServerResponse.createByErrorMessage("程序异常");
+    }
+
+
+    public static ServerResponse hand(Exception e) {
+        List<Map> collect = Arrays.asList(e.getStackTrace()).stream().map(stackTraceElement -> {
+            Map linkedHashMap = new LinkedHashMap();
+            linkedHashMap.put("lineNumber", stackTraceElement.getLineNumber());
+            linkedHashMap.put("fileNme", stackTraceElement.getFileName());
+            linkedHashMap.put("className", stackTraceElement.getClassName());
+            linkedHashMap.put("methodName", stackTraceElement.getMethodName());
+            return linkedHashMap;
+        }).collect(Collectors.toList());
+        //
+        List throwableList = Arrays.asList(e.getSuppressed()).stream().map(throwable -> throwable.getCause()).collect(Collectors.toList());
+        String message = CollectionUtils.isEmpty(throwableList) ? e.getMessage() : throwableList.toString();
+        JSONObject json = new JSONObject();
+        json.put("message", message);
+        json.put("info", collect);
+        return ServerResponse.createByErrorMessage(json.toJSONString());
     }
 }

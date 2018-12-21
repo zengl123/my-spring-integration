@@ -23,11 +23,11 @@ import org.springframework.stereotype.Component;
 @Component
 @PropertySource("classpath:hk8700.properties")
 public class CommonUtil {
-    @Value("${tdp.hk87.url}")
+    @Value("${tdp.hk.url}")
     private String host;
-    @Value("${tdp.hk87.key}")
+    @Value("${tdp.hk.key}")
     private String appKey;
-    @Value("${tdp.hk87.secret}")
+    @Value("${tdp.hk.secret}")
     private String secret;
 
     /**

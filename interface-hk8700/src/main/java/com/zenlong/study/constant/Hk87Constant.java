@@ -8,8 +8,18 @@ package com.zenlong.study.constant;
  * @Created 2018/12/20  14:53.
  */
 public interface Hk87Constant {
-
+    /**
+     * 接口成功响应状态码
+     */
     Integer RESPONSE_SUCCESS_CODE = 0;
+    /**
+     * 默认页码
+     */
+    Integer PAGE_NO = 1;
+    /**
+     * 默认大小
+     */
+    Integer PAGE_SIZE = 100;
     /**
      * 获取默认用户UUID的接口地址
      */

@@ -28,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -103,7 +101,7 @@ public class CameraServiceImpl implements ICameraService {
         JSONObject head = table.getJSONObject("head");
         JSONObject result = head.getJSONObject("result");
         Integer resultCode = result.getInteger("result_code");
-        if (CameraConstant.interfaceResponseSuccessCode.equals(resultCode)) {
+        if (CameraConstant.INTERFACE_RESPONSE_SUCCESSCODE.equals(resultCode)) {
             Integer size = result.getInteger("size");
             JSONArray row = new JSONArray();
             JSONObject rows = table.getJSONObject("rows");
