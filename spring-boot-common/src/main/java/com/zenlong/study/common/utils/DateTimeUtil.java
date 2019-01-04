@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import java.sql.Time;
 import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,7 +18,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @Description 时间工具类
@@ -389,6 +390,7 @@ public class DateTimeUtil {
         LocalDateTime localDateTime = second > 0 ? LocalDateTime.parse(time, f).plusSeconds(second) : LocalDateTime.parse(time, f).minusSeconds(Math.abs(second));
         return localDateTime.format(f);
     }
+
     /**
      * 标准时间格式的字符串 加|减 day
      *
@@ -418,5 +420,11 @@ public class DateTimeUtil {
         return format;
     }
 
+    public static Date strToDate(String strDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS);
+        ParsePosition pos = new ParsePosition(0);
+        Date date = formatter.parse(strDate, pos);
+        return date;
+    }
 }
 

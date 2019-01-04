@@ -1,5 +1,7 @@
 package com.zenlong.study.common.security;
 
+import com.zenlong.study.common.excpetion.ExceptionUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,12 +17,9 @@ import java.security.MessageDigest;
  * @Version
  * @Modified By
  */
+@Slf4j
 public class Md5Util {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Md5Util.class);
-
     private static final String[] HEX_DIGITS = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
-
     private static String encodingCharset = "UTF-8";
 
     private static String byteArrayToHexString(byte[] b) {
@@ -58,9 +57,9 @@ public class Md5Util {
             } else {
                 resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetName)));
             }
-        } catch (Exception exception) {
+        } catch (Exception e) {
             resultString = "";
-            LOGGER.error("Md5加密异常,error={}", exception);
+            log.error("Md5加密异常:{}", ExceptionUtil.hand(e));
         }
         return resultString;
     }

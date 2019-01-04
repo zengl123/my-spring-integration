@@ -2,7 +2,6 @@ package com.zenlong.study.domain.po;
 
 import com.zenlong.study.domain.BaseModel;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
 
@@ -17,7 +16,6 @@ import java.math.BigDecimal;
 public class ParkExportRecord extends BaseModel {
     public final static transient String INDEX = "index_park_export_record";
     public final static transient String TYPE = "type_park_export_record";
-    @Id
     private String id;
     /**
      * 停车场编号

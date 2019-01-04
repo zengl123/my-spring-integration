@@ -1,6 +1,7 @@
 package com.zenlong.study.dao;
 
 import com.zenlong.study.domain.po.EcUser;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.generator.api.dom.java.BaseMapper;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @description
  * @date 2018/09/11 21:52
  */
-@Component
+@Mapper
 public interface EcUserMapper extends BaseMapper<EcUser> {
     /**
      * 校验用户名

@@ -11,7 +11,7 @@ import com.zenlong.study.common.utils.DateTimeUtil;
 import com.zenlong.study.constant.InterfaceConstant;
 import com.zenlong.study.domain.ParkEntryRecordThird;
 import com.zenlong.study.domain.po.ParkExportRecord;
-import com.zenlong.study.domain.po.ParkInfo;
+import com.zenlong.study.domain.po.ParkDeviceInfo;
 import com.zenlong.study.es.utils.ElasticsearchUtil;
 import com.zenlong.study.service.IParkService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,6 @@ import org.apache.http.HttpStatus;
 import org.elasticsearch.action.search.SearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -58,14 +57,14 @@ public class ParkServiceImpl implements IParkService {
      * @return
      */
     @Override
-    public ServerResponse<List<ParkInfo>> listParkInfo() {
+    public ServerResponse<List<ParkDeviceInfo>> listParkInfo() {
         String url = host + InterfaceConstant.GET_PARK_INFO;
         //停车场编号集合
         List<String> listParkNo = Arrays.asList(parkNos.split(","));
         //停车场名称集合
         List<String> listParkName = Arrays.asList(parkNames.split(","));
         final int[] i = {0};
-        List<ParkInfo> list = new ArrayList<>();
+        List<ParkDeviceInfo> list = new ArrayList<>();
         listParkNo.stream().forEach(parkNo -> {
             String requestUrl = url + parkNo.trim();
             Result invoke;
@@ -113,7 +112,7 @@ public class ParkServiceImpl implements IParkService {
                 Integer totalUsed = total - totalIdle;
                 String parkName = listParkName.get(i[0]);
                 i[0]++;
-                ParkInfo parkInfo = new ParkInfo();
+                ParkDeviceInfo parkInfo = new ParkDeviceInfo();
                 parkInfo.setParkNo(parkNo);
                 parkInfo.setParkName(parkName);
                 parkInfo.setParkTotalNum(total);

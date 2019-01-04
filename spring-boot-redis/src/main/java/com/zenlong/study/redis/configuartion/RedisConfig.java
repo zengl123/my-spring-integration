@@ -2,6 +2,7 @@ package com.zenlong.study.redis.configuartion;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @Description Redis配置
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * @Modified By
  */
 @Configuration
+@PropertySource("classpath:redis.properties")
 public class RedisConfig {
     @Value("${spring.redis.host}")
     private String host;

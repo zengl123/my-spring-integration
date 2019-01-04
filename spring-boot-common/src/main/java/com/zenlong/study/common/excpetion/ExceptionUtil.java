@@ -94,6 +94,7 @@ public class ExceptionUtil {
 
 
     public static ServerResponse hand(Exception e) {
+        e.printStackTrace();
         List<Map> collect = Arrays.asList(e.getStackTrace()).stream().map(stackTraceElement -> {
             Map linkedHashMap = new LinkedHashMap();
             linkedHashMap.put("lineNumber", stackTraceElement.getLineNumber());
@@ -102,7 +103,6 @@ public class ExceptionUtil {
             linkedHashMap.put("methodName", stackTraceElement.getMethodName());
             return linkedHashMap;
         }).collect(Collectors.toList());
-        //
         List throwableList = Arrays.asList(e.getSuppressed()).stream().map(throwable -> throwable.getCause()).collect(Collectors.toList());
         String message = CollectionUtils.isEmpty(throwableList) ? e.getMessage() : throwableList.toString();
         JSONObject json = new JSONObject();

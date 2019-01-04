@@ -2,12 +2,18 @@ package com.zenlong.study.es.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.gson.JsonElement;
 import com.zenlong.study.common.ServerResponse;
+import com.zenlong.study.common.excpetion.CusException;
 import com.zenlong.study.common.excpetion.ExceptionUtil;
+import com.zenlong.study.common.utils.DateTimeUtil;
+import com.zenlong.study.common.utils.GsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -48,11 +54,16 @@ public class ElasticsearchUtil {
      * @param index
      * @return
      */
-    public boolean isIndexExist(String index) throws Exception {
+    public boolean isIndexExist(String index) {
         GetIndexRequest request = new GetIndexRequest();
         request.indices(index);
         request.humanReadable(true);
-        boolean exists = highLevelClient.indices().exists(request, RequestOptions.DEFAULT);
+        boolean exists;
+        try {
+            exists = highLevelClient.indices().exists(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new CusException("IOException:{}", e);
+        }
         return exists;
     }
 
@@ -61,19 +72,77 @@ public class ElasticsearchUtil {
      *
      * @param index
      * @param type
-     * @param t
+     * @param data
      * @return
      */
-    public <T> ServerResponse insert(String index, String type, T t) {
+    public ServerResponse insert(String index, String type, Object data) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(index), "index can not be empty");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(type), "type can not be empty");
+        //判断data
+        JsonElement requestData = GsonUtil.createByDateFormat().toJsonTree(data);
+        if (requestData.isJsonNull() || requestData.isJsonPrimitive() || requestData.isJsonArray()) {
+            throw new IllegalArgumentException("请求参数必须是key/value结构数据体");
+        }
+        JSONObject json = JSONObject.parseObject(JSON.toJSONString(data));
+        String id = json.get("id") == null ? "" : json.get("id").toString();
+        String createTime = DateTimeUtil.getCurrentDatetime();
+        if (!StringUtils.isEmpty(id)) {
+            ServerResponse<JSONObject> byId = getById(index, type, id);
+            if (byId.isSuccess()) {
+                createTime = byId.getData().getString("create_time");
+            }
+        }
+        json.put("create_time", createTime);
+        json.put("modified_time", createTime);
         IndexRequest request = new IndexRequest(index, type);
-        request.source(String.valueOf(t), XContentType.JSON);
+        request.source(json, XContentType.JSON);
         try {
             IndexResponse indexResponse = highLevelClient.index(request, RequestOptions.DEFAULT);
-            String id = indexResponse.getId();
+            id = indexResponse.getId();
             return ServerResponse.createBySuccess(id);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return ServerResponse.createByErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            log.error("新增异常:{}", ExceptionUtil.hand(e));
+            return ServerResponse.createByErrorMessage("新增失败");
+        }
+    }
+
+    /**
+     * 批量新增
+     *
+     * @return
+     */
+    public ServerResponse bulk(String index, String type, Object list) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(index), "index can not be empty");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(type), "type can not be empty");
+        //判断data
+        JsonElement requestData = GsonUtil.createByDateFormat().toJsonTree(list);
+        if (list == null || requestData.isJsonNull() || !requestData.isJsonArray()) {
+            throw new IllegalArgumentException("请求参数必须是Array结构数据体");
+        }
+        BulkRequest bulkRequest = new BulkRequest();
+        final String[] createTime = {DateTimeUtil.getCurrentDatetime()};
+        List newList = (List) list;
+        newList.forEach(t -> {
+            JSONObject json = JSONObject.parseObject(JSON.toJSONString(t));
+            String id = json.get("id") == null ? "" : json.get("id").toString();
+            if (!StringUtils.isEmpty(id)) {
+                ServerResponse<JSONObject> byId = getById(index, type, id);
+                if (byId.isSuccess()) {
+                    createTime[0] = byId.getData().getString("create_time");
+                }
+            }
+            json.put("create_time", createTime[0]);
+            json.put("modified_time", createTime[0]);
+            IndexRequest indexRequest = new IndexRequest(index, type);
+            indexRequest.source(json, XContentType.JSON);
+            bulkRequest.add(indexRequest);
+        });
+        try {
+            highLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+            return ServerResponse.createBySuccess();
+        } catch (Exception e) {
+            log.error("批量新增异常:{}", ExceptionUtil.hand(e));
+            return ServerResponse.createByErrorMessage("批量新增失败");
         }
     }
 
@@ -90,30 +159,9 @@ public class ElasticsearchUtil {
         try {
             DeleteResponse delete = highLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
             return ServerResponse.createBySuccess(delete.getId());
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return ServerResponse.createByErrorMessage(e.getMessage());
-        }
-    }
-
-    /**
-     * 批量新增
-     *
-     * @return
-     */
-    public <T> ServerResponse bulk(String index, String type, List<T> list) {
-        BulkRequest bulkRequest = new BulkRequest();
-        list.stream().forEach(t -> {
-            IndexRequest indexRequest = new IndexRequest(index, type);
-            indexRequest.source(t, XContentType.JSON);
-            bulkRequest.add(indexRequest);
-        });
-        try {
-            BulkResponse bulk = highLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-            return ServerResponse.createBySuccess(bulk.hasFailures());
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return ServerResponse.createByErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            log.error("根据文档id删除文档异常:{}", ExceptionUtil.hand(e));
+            return ServerResponse.createByErrorMessage("根据文档id删除文档失败");
         }
     }
 
@@ -125,15 +173,15 @@ public class ElasticsearchUtil {
      * @param id
      * @return
      */
-    public ServerResponse getById(String index, String type, String id) {
+    public ServerResponse<JSONObject> getById(String index, String type, String id) {
         GetRequest getRequest = new GetRequest(index, type, id);
         try {
             GetResponse documentFields = highLevelClient.get(getRequest, RequestOptions.DEFAULT);
-            Map<String, Object> source = documentFields.getSource();
+            JSONObject source = (JSONObject) documentFields.getSource();
             return ServerResponse.createBySuccess(source);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            return ServerResponse.createByErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            log.error("根据文档id查询文档信息异常:{}", ExceptionUtil.hand(e));
+            return ServerResponse.createByErrorMessage("根据文档id查询文档信息失败");
         }
     }
 
@@ -143,17 +191,27 @@ public class ElasticsearchUtil {
      * @param searchRequest
      * @return
      */
-    public ServerResponse<List<Map>> queryByTerm(SearchRequest searchRequest) throws IOException {
+    public ServerResponse<List<Map>> queryByTerm(SearchRequest searchRequest) {
+        log.debug("sql:{}", searchRequest);
         return queryByTerm(searchRequest, Map.class);
     }
 
+    /**
+     * 根据条件查询
+     *
+     * @param searchRequest
+     * @param tClass
+     * @param <T>
+     * @return
+     */
     public <T> ServerResponse<List<T>> queryByTerm(SearchRequest searchRequest, Class<T> tClass) {
         log.debug("sql:{}", searchRequest);
         SearchResponse search;
         try {
             search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         } catch (Exception e) {
-            return ServerResponse.createByErrorMessage(ExceptionUtil.hand(e).getMessage());
+            log.error("根据条件查询文档信息异常:{}", ExceptionUtil.hand(e));
+            return ServerResponse.createByErrorMessage("根据条件查询文档信息失败");
         }
         SearchHits hits = search.getHits();
         List<T> collect = Stream.of(hits.getHits())
@@ -167,8 +225,21 @@ public class ElasticsearchUtil {
         return ServerResponse.createBySuccess(collect);
     }
 
-    public <T> ServerResponse<List<T>> queryByTermNoId(SearchRequest searchRequest, Class<T> tClass) throws IOException {
-        SearchResponse search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+    /**
+     * @param searchRequest
+     * @param tClass
+     * @param <T>
+     * @return
+     */
+    public <T> ServerResponse<List<T>> queryByTermNoId(SearchRequest searchRequest, Class<T> tClass) {
+        log.debug("sql:{}", searchRequest);
+        SearchResponse search;
+        try {
+            search = highLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            log.error("根据条件查询文档信息异常:{}", ExceptionUtil.hand(e));
+            return ServerResponse.createByErrorMessage("根据条件查询文档信息失败");
+        }
         SearchHits hits = search.getHits();
         List<T> collect = Stream.of(hits.getHits()).map(hit -> (JSON.parseObject(hit.getSourceAsString(), tClass))).collect(Collectors.toList());
         return ServerResponse.createBySuccess(collect);

@@ -45,13 +45,13 @@ public class CommonUtil {
         try {
             result = HttpClientUtil.POST.applicationJson(url, null, param.toJSONString(), null);
         } catch (Exception e) {
-            log.error("请求获取默认用户UUID接口异常,errorMessage:{}", e.getMessage());
+            log.error("请求获取默认用户UUID接口异常:{}", e.getMessage());
             return ServerResponse.createByErrorMessage("获取默认用户UUID失败");
         }
         int status = result.getStatus();
         String content = result.getContent();
         if (HttpStatus.SC_OK != status) {
-            log.error("请求获取默认用户UUID接口失败,errorMessage:{}", content);
+            log.error("请求获取默认用户UUID接口失败:{}", content);
             return ServerResponse.createByErrorMessage("获取默认用户UUID失败");
         }
         try {

@@ -2,7 +2,7 @@ package com.zenlong.study.service;
 
 import com.zenlong.study.common.ServerResponse;
 import com.zenlong.study.domain.po.ParkExportRecord;
-import com.zenlong.study.domain.po.ParkInfo;
+import com.zenlong.study.domain.po.ParkDeviceInfo;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public interface IParkService {
      *
      * @return
      */
-    ServerResponse<List<ParkInfo>> listParkInfo();
+    ServerResponse<List<ParkDeviceInfo>> listParkInfo();
 
     /**
      * 进场记录

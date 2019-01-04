@@ -3,7 +3,7 @@ package com.zenlong.study.configuration;
 import com.google.gson.Gson;
 import com.zenlong.study.annotation.SysLog;
 import com.zenlong.study.common.utils.IpUtil;
-import com.zenlong.study.domain.SysLogBO;
+import com.zenlong.study.domain.bo.SysLogBo;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -70,25 +70,25 @@ public class SysLogAspect {
     private void saveLog(ProceedingJoinPoint joinPoint, long time) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        SysLogBO sysLogBO = new SysLogBO();
-        sysLogBO.setExecutionTime(time);
-        sysLogBO.setCreateTime(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        SysLogBo sysLogBo = new SysLogBo();
+        sysLogBo.setExecutionTime(time);
+        sysLogBo.setCreateTime(LocalDateTime.now().withNano(0).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         SysLog sysLog = method.getAnnotation(SysLog.class);
         if (sysLog != null) {
             //注解上的描述
-            sysLogBO.setRemark(sysLog.value());
+            sysLogBo.setRemark(sysLog.value());
         }
         // 接收到请求，记录请求内容
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         StringBuffer requestURL = request.getRequestURL();
-        sysLogBO.setRequestUrl(requestURL.toString());
-        sysLogBO.setIpAddress(IpUtil.getIpAddress(request));
+        sysLogBo.setRequestUrl(requestURL.toString());
+        sysLogBo.setIpAddress(IpUtil.getIpAddress(request));
         //请求的 类名、方法名
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = signature.getName();
-        sysLogBO.setClassName(className);
-        sysLogBO.setMethodName(methodName);
+        sysLogBo.setClassName(className);
+        sysLogBo.setMethodName(methodName);
         //请求的参数
         Object[] args = joinPoint.getArgs();
         try {
@@ -96,11 +96,11 @@ public class SysLogAspect {
             for (Object o : args) {
                 list.add(new Gson().toJson(o));
             }
-            sysLogBO.setRequestBody(list.toString());
+            sysLogBo.setRequestBody(list.toString());
         } catch (Exception e) {
             log.error("解析请求参数异常:{}", e.getMessage());
         }
-        //sysLogService.save(sysLogBO);
-        System.out.println("sysLogBO = " + sysLogBO);
+        //sysLogService.save(sysLogBo);
+        System.out.println("sysLogBO = " + sysLogBo);
     }
 }

@@ -3,6 +3,7 @@ package com.zenlong.study.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.zenlong.study.common.ServerResponse;
 import com.zenlong.study.common.excpetion.CusException;
 import com.zenlong.study.common.excpetion.ExceptionUtil;
@@ -11,32 +12,36 @@ import com.zenlong.study.common.httpclient.HttpClientUtil.Result;
 import com.zenlong.study.common.utils.DateTimeUtil;
 import com.zenlong.study.constant.Hk87Constant;
 import com.zenlong.study.domain.TrafficRecordThird;
-import com.zenlong.study.domain.po.TrafficPointInfo;
+import com.zenlong.study.domain.po.TrafficDeviceInfo;
 import com.zenlong.study.domain.po.TrafficRecord;
-import com.zenlong.study.es.utils.ElasticsearchUtil;
+import com.zenlong.study.repository.TrafficDeviceRepository;
+import com.zenlong.study.repository.TrafficRecordRepository;
 import com.zenlong.study.service.ITrafficService;
 import com.zenlong.study.utils.CommonUtil;
 import com.zenlong.study.utils.SignUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.script.Script;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Service;
 
-import javax.lang.model.SourceVersion;
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * 描述:
@@ -59,9 +64,36 @@ public class TrafficServiceImpl implements ITrafficService {
     private String dataSyncTime;
     private String defaultUuid;
     @Autowired
-    private CommonUtil commonUtil;
+    private TrafficDeviceRepository trafficDeviceRepository;
     @Autowired
-    private ElasticsearchUtil elasticsearchUtil;
+    private TrafficRecordRepository trafficRecordRepository;
+    @Autowired
+    private ElasticsearchTemplate template;
+    @Autowired
+    private CommonUtil commonUtil;
+
+
+    /**
+     * 新增客流监控点信息
+     *
+     * @param deviceInfo
+     * @return
+     */
+    @Override
+    public ServerResponse insertTrafficDeviceInfo(TrafficDeviceInfo deviceInfo) {
+        String id = deviceInfo.getId();
+        String createTime = DateTimeUtil.getCurrentDatetime();
+        TrafficDeviceInfo trafficDeviceInfo;
+        if (StringUtils.isEmpty(id)) {
+            deviceInfo.setCreateTime(createTime);
+        } else {
+            trafficDeviceInfo = trafficDeviceRepository.findById(id);
+            deviceInfo.setCreateTime(trafficDeviceInfo.getCreateTime());
+        }
+        deviceInfo.setModifiedTime(createTime);
+        trafficDeviceInfo = trafficDeviceRepository.save(deviceInfo);
+        return ServerResponse.createBySuccess(trafficDeviceInfo);
+    }
 
     /**
      * 数据同步
@@ -77,22 +109,19 @@ public class TrafficServiceImpl implements ITrafficService {
             }
             defaultUuid = serverResponse.getData().toString();
         }
-        ServerResponse<List<TrafficPointInfo>> serverResponse = listDeviceInfo();
+        ServerResponse<List<TrafficDeviceInfo>> serverResponse = listTrafficDeviceInfo();
         if (!serverResponse.isSuccess()) {
-            log.error("获取客流监控点列表数据失败:{}", serverResponse.getMessage());
-            serverResponse.setMessage("获取客流监控点列表数据失败");
             return serverResponse;
         }
         if (serverResponse.getData().size() <= 0) {
+            log.info("客流监控点列表数据不存在");
             serverResponse.setMessage("客流监控点列表数据不存在");
             return serverResponse;
         }
         //客流监控点集合
-        List<TrafficPointInfo> trafficPointInfoList = serverResponse.getData();
+        List<TrafficDeviceInfo> trafficPointInfoList = serverResponse.getData();
         ServerResponse<String> syncTime = getSyncTime();
         if (!syncTime.isSuccess()) {
-            log.error("获取原始数据同步时间失败:{}", syncTime.getMessage());
-            syncTime.setMessage("获取原始数据同步时间失败");
             return syncTime;
         }
         //同步时间
@@ -165,14 +194,8 @@ public class TrafficServiceImpl implements ITrafficService {
                 });
                 //获取数据存储
                 if (CollectionUtils.isNotEmpty(list)) {
-                    ServerResponse response = elasticsearchUtil.bulk(TrafficRecord.INDEX, TrafficRecord.TYPE, list);
-                    if (response.isSuccess()) {
-                        log.info("{}-{}时间段内第三方监控客流数据接口响应数据存储成功", beginTime, endTime);
-                        beginTime = endTime;
-                    } else {
-                        log.error("第三方监控客流数据接口响应数据存储失败:{}", response.getMessage());
-                        throw new CusException("第三方监控客流数据接口响应数据存储失败");
-                    }
+                    boolean trafficRecords= trafficRecordRepository.saveAll(list);
+                    return ServerResponse.createBySuccess(trafficRecords);
                 }
             } while (endTime.compareTo(currentDatetime) > 0);
             return ServerResponse.createBySuccess();
@@ -204,13 +227,10 @@ public class TrafficServiceImpl implements ITrafficService {
      *
      * @return
      */
-    private ServerResponse listDeviceInfo() {
-        SearchRequest searchRequest = new SearchRequest();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.termQuery("is_deleted.keyword", "N"));
-        searchSourceBuilder.size(1000);
-        searchRequest.source(searchSourceBuilder);
-        return elasticsearchUtil.queryByTerm(searchRequest, TrafficPointInfo.class);
+    public ServerResponse<List<TrafficDeviceInfo>> listTrafficDeviceInfo() {
+        Iterable<TrafficDeviceInfo> all = trafficDeviceRepository.findAll();
+        ArrayList<TrafficDeviceInfo> trafficDeviceInfos = Lists.newArrayList(all);
+        return ServerResponse.createBySuccess(trafficDeviceInfos);
     }
 
     /**
@@ -219,38 +239,13 @@ public class TrafficServiceImpl implements ITrafficService {
      * @return
      */
     private ServerResponse getSyncTime() {
-        SearchRequest searchRequest = new SearchRequest();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //按指定字段降序排序
-        searchSourceBuilder.sort(new FieldSortBuilder("access_time.keyword").order(SortOrder.DESC));
-        searchSourceBuilder.size(1);
-        searchRequest.source(searchSourceBuilder);
-        ServerResponse<List<TrafficRecord>> serverResponse = elasticsearchUtil.queryByTerm(searchRequest, TrafficRecord.class);
-        //针对开始无index特殊处理
-        if (!serverResponse.isSuccess()) {
-            String message = serverResponse.getMessage();
-            String no = "No mapping found for [access_time.keyword] in order to sort on";
-            if (message.contains(no)) {
-                return ServerResponse.createBySuccess(dataSyncTime);
-            } else {
-                return ServerResponse.createByErrorMessage(serverResponse.getMessage());
-            }
+        TrafficRecord trafficRecord = trafficRecordRepository.findOneByAccessTimeDesc();
+        String syncTime;
+        if (null != trafficRecord) {
+            syncTime = trafficRecord.getAccessTime();
+        } else {
+            syncTime = dataSyncTime;
         }
-        return ServerResponse.createBySuccess(serverResponse.getData().get(0).getAccessTime());
-    }
-
-    /**
-     * 获取原始数据同步时间
-     *
-     * @return
-     */
-    private ServerResponse<List<TrafficRecord>> getDaySyncTime() {
-        SearchRequest searchRequest = new SearchRequest();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //按指定字段降序排序
-        searchSourceBuilder.sort(new FieldSortBuilder("access_time").order(SortOrder.DESC));
-        searchSourceBuilder.size(1);
-        searchRequest.source(searchSourceBuilder);
-        return elasticsearchUtil.queryByTerm(searchRequest, TrafficRecord.class);
+        return ServerResponse.createBySuccess(syncTime);
     }
 }

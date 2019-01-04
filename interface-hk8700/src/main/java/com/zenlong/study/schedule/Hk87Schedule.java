@@ -1,11 +1,17 @@
 package com.zenlong.study.schedule;
 
+import com.zenlong.study.domain.po.TrafficDeviceInfo;
+import com.zenlong.study.repository.TrafficDeviceRepository;
 import com.zenlong.study.service.ITrafficService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 描述:
@@ -18,7 +24,6 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 @PropertySource("classpath:hk8700.properties")
 public class Hk87Schedule {
-
     @Autowired
     private ITrafficService service;
 
