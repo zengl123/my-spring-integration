@@ -20,6 +20,7 @@
         <module>interface-camera-hk7600</module>
         <module>interface-alarm-hk7600</module>
         <module>interface-hk8700</module>
+        <module>interface-em-puhou-v1</module>
     </modules>
 
     <parent>
@@ -45,6 +46,7 @@
         <common.lang3.version>3.4</common.lang3.version>
         <common.collections.version>3.2.2</common.collections.version>
         <mybatis-generator-maven-plugin.version>1.3.7</mybatis-generator-maven-plugin.version>
+        <elasticsearch.version>6.5.3</elasticsearch.version>
     </properties>
 
     <!--配置maven项目的远程仓库-->
@@ -125,11 +127,6 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>${common.collections.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
