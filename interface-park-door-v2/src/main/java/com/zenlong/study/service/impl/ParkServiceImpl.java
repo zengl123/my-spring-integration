@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zenlong.study.common.ServerResponse;
+import com.zenlong.study.common.excpetion.ExceptionUtil;
 import com.zenlong.study.common.httpclient.HttpClientUtil;
 import com.zenlong.study.common.httpclient.HttpClientUtil.Result;
 import com.zenlong.study.common.utils.CheckUtil;
@@ -120,7 +121,7 @@ public class ParkServiceImpl implements IParkService {
                 parkInfo.setParkRemainderNum(totalIdle);
                 list.add(parkInfo);
             } catch (Exception e) {
-                log.error("第三方获取停车场信息列表接口数据响应结果解析异常,errorMessage{}", e.getMessage());
+                log.error("第三方获取停车场信息列表接口数据响应结果解析异常:{}", ExceptionUtil.hand(e));
                 return;
             }
         });

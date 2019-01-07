@@ -21,6 +21,7 @@
         <module>interface-alarm-hk7600</module>
         <module>interface-hk8700</module>
         <module>interface-em-puhou-v1</module>
+        <module>interface-gps-scooper-v1</module>
     </modules>
 
     <parent>
