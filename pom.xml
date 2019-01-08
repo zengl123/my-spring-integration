@@ -10,7 +10,6 @@
         <module>spring-boot-service</module>
         <module>spring-boot-dao</module>
         <module>spring-boot-web</module>
-        <module>spring-boot-interface</module>
         <module>spring-boot-redis</module>
         <module>spring-boot-elasticsearch</module>
         <module>interface-gps-jt808</module>
@@ -20,7 +19,6 @@
         <module>interface-camera-hk7600</module>
         <module>interface-alarm-hk7600</module>
         <module>interface-hk8700</module>
-        <module>interface-em-puhou-v1</module>
         <module>interface-gps-scooper-v1</module>
         <module>spring-boot-example</module>
     </modules>
@@ -30,7 +28,6 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.0.4.RELEASE</version>
     </parent>
-
     <groupId>com.zenlong.study</groupId>
     <artifactId>my-spring-integration</artifactId>
     <packaging>pom</packaging>
