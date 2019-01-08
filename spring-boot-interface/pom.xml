@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>my-spring-integration</artifactId>
+        <groupId>com.zenlong.study</groupId>
+        <version>1.0</version>
+    </parent>
+
+    <groupId>com.zenlong.study</groupId>
+    <artifactId>spring-boot-interface</artifactId>
+    <version>1.0</version>
+    <packaging>war</packaging>
+    <name>spring-boot-interface</name>
+
+    <properties>
+        <elasticsearch.version>6.5.3</elasticsearch.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.zenlong.study</groupId>
+            <artifactId>interface-em-puhou-v1</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!--elasticsearch包-->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <!--spring整合elasticsearch包-->
+        <dependency>
+            <groupId>org.elasticsearch.plugin</groupId>
+            <artifactId>transport-netty4-client</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>ROOT</finalName>
+    </build>
+</project>
