@@ -22,6 +22,7 @@
         <module>interface-hk8700</module>
         <module>interface-em-puhou-v1</module>
         <module>interface-gps-scooper-v1</module>
+        <module>spring-boot-example</module>
     </modules>
 
     <parent>
@@ -92,6 +93,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
